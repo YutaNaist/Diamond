@@ -1,0 +1,40 @@
+{
+    "id": "202307-NR-301-00001",
+    "index" : 0,
+    "persons": [
+        {
+            "name": "山田 太郎",
+            "ocild": "",
+            "e-rad": "",
+            "email": "dummy1@example.com",
+            "affiliation": "NAIST"
+        }
+    ],
+    "contact": {
+        "email": "dummy1@example.com",
+        "phone_number": "090-1234-5678",
+        "address": "東京都港区六本木1-1-1 六本木ヒルズ"
+    },
+    "instrument": {
+        "name": "X線構造解析装置",
+        "identifier": "NR-301"
+    },
+    "experiment_date": {
+        "start_date": "2023/07/20",
+        "start_time": "10:00",
+        "end_date": "2023/07/20",
+        "end_time": "10:00"
+    },
+    "data_policy": {
+        "share_status": "0",
+        "gmail_address": ""
+    },
+    "original_files": [
+        {
+            "file_name": "test1.txt",
+            "comments" : "test1"
+        }
+    ],
+    "arim_metadata": {},
+    "free_comment": "test"
+}
