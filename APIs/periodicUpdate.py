@@ -13,7 +13,6 @@ from APIs.googleSpreadSheetHandler import GoogleSpreadSheetHandler
 
 
 class PeriodicUpdate:
-
     # periodicExecutionTime = {"hour": 0, "minute": 0, "second": 0}
     # __periodicInterval = 86400
     # loadExcelList = [
