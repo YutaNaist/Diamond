@@ -44,16 +44,19 @@ class Copy_From_Original_To_Share:
                 data_directory = self.str_Storage_Directory + "/{}/{}/data/".format(
                     self.str_Experiment_ID, self.str_Experiment_ID)
                 file_directory = data_directory + file_name
-                if os.path.isfile(file_directory):
-                    shutil.copy(
-                        file_directory, self.str_Share_Directory +
-                        file_directory[len(data_directory):])
-                else:
-                    try:
-                        os.makedirs(self.str_Share_Directory + file_name,
-                                    exist_ok=True)
-                    except FileExistsError:
-                        pass
+                try:
+                    if os.path.isfile(file_directory):
+                        shutil.copy(
+                            file_directory, self.str_Share_Directory +
+                            file_directory[len(data_directory):])
+                    else:
+                        try:
+                            os.makedirs(self.str_Share_Directory + file_name,
+                                        exist_ok=True)
+                        except FileExistsError:
+                            pass
+                except FileNotFoundError:
+                    pass
             dictReturnMessage["status"] = True
             dictReturnMessage["message"] = "Success."
             returnArgs = {}

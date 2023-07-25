@@ -6,6 +6,7 @@ import time
 
 
 class GoogleSpreadSheetHandler:
+
     def __init__(self, str_Authorize_Json="", logger=None):
         if logger is None:
             self.logger = logging.getLogger(__name__)
@@ -43,13 +44,15 @@ class GoogleSpreadSheetHandler:
                 self.list_ID_SpreadSheet_Brows = []
                 self.list_last_update_Date_SpreadSheet = []
                 for i in range(len(data) - 1):
-                    self.list_ID_SpreadSheet_Input.append(data[i + 1][1])
-                    self.list_ID_SpreadSheet_Brows.append(data[i + 1][2])
-                    self.list_last_update_Date_SpreadSheet.append("")
+                    if data[i + 1][1] != "" and data[i + 1][2] != "":
+                        self.list_ID_SpreadSheet_Input.append(data[i + 1][1])
+                        self.list_ID_SpreadSheet_Brows.append(data[i + 1][2])
+                        self.list_last_update_Date_SpreadSheet.append("")
                 self.last_updated_ID_List_Sheet = last_Update_Time
                 return False
             except gspread.exceptions.APIError:
                 self.logger.warning("APIError in update IDs")
+                # self.logger.warning("APIError in update IDs")
                 time.sleep(10)
                 return self.update_Spread_Sheet_IDs_From_Sheet(
                     str_ID_Spread_Sheet)

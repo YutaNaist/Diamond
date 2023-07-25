@@ -70,7 +70,7 @@ class PeriodicUpdate:
                     "authorization_json_google_drive_api"],
                 dict_Environment_Variable["setting_yaml_google_drive_api"])
             self.google_Spread_Sheet_Handler = GoogleSpreadSheetHandler(
-                str_Authorize_Json=self.str_Authorize_Json)
+                str_Authorize_Json=self.str_Authorize_Json, logger=self.logger)
 
             self.proposal_List_To_Save = ProposalList(
                 google_Spread_Sheet_Handler=self.google_Spread_Sheet_Handler,
@@ -149,12 +149,8 @@ class PeriodicUpdate:
                         #   "interval": self.int_Periodic_Interval
                         "interval": intNextInterval
                     })
-                # print("periodic check 4")
-                # print(intNextInterval)
                 print(datetime.datetime.now())
                 schedule.run()
-                # print("periodic check 4.5")
-                # print()
             except BaseException as e:
                 logging.warning(e)
 

@@ -1,3 +1,5 @@
 test/*
 APIs/checkAndGetSingleProposal.py
-
+APIs/__pycache__
+__pycache__
+.vscode
