@@ -25,6 +25,7 @@ class FinishExperiment:
         self.str_Experiment_Directory = self.str_Storage_Directory + self.experiment_ID + "/"
         self.is_Share_With_Google = False
         self.str_Share_Google_Address = ""
+        self.logger = logger
 
         if share_Directory != "":
             self.str_Share_Directory = share_Directory
@@ -141,6 +142,14 @@ class FinishExperiment:
         if not os.path.exists(dataDirectory):
             os.mkdir(dataDirectory)
         # filesInShareFolder = glob.glob(originalDirectory + "*", recursive=True)
+        for i, file in enumerate(self.list_File_Names):
+            full_Path_Original = str_Share_Directory + file
+            full_Path_Storage = dataDirectory + file
+            if os.path.isdir(full_Path_Original):
+                try:
+                    os.makedirs(full_Path_Storage)
+                except BaseException:
+                    pass
         for i, file in enumerate(self.list_File_Names):
             full_Path_Original = str_Share_Directory + file
             full_Path_Storage = dataDirectory + file

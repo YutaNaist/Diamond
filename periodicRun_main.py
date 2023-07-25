@@ -6,11 +6,11 @@ from pydrive2.auth import GoogleAuth
 import commandsForDiamond
 
 
-def make_logger():
+def make_logger(environment_Variable):
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
 
-    log_File_Handler = logging.FileHandler('C:/diamond/log_periodic.log')
+    log_File_Handler = logging.FileHandler(environment_Variable["log_directory"] + 'log_periodic.log')
     # log_File_Handler = logging.handlers.RotatingFileHandler(
     #     'C:/diamond/log_diamond.log', maxBytes=100_000_000, BackupCount=10)
     fh_formatter = logging.Formatter(
@@ -29,9 +29,9 @@ def make_logger():
     return logger
 
 
-logger = make_logger()
 environment_Variable = json.load(
-    open("C:/diamond/environment_variable.json", mode="r", encoding='utf-8'))
+    open("C:/Program Files/diamond/environment_variable.json", mode="r", encoding='utf-8'))
+logger = make_logger(environment_Variable)
 ipaddress = environment_Variable["host_ip"]
 port = environment_Variable["host_port"]
 
