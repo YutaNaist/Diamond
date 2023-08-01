@@ -2,6 +2,7 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import logging
 
+import datetime
 import time
 
 
@@ -30,12 +31,22 @@ class GoogleSpreadSheetHandler:
         try:
             sheet = self.client.open_by_url(str_URL_Spread_Sheet)
             last_Update = sheet.lastUpdateTime
-            if last_Update == self.last_updated_Input_sheet:
+            worksheet = sheet.get_worksheet(0)
+            #self.last_updated_Input_sheet = last_Update
+            listAll = worksheet.get_all_values()
+            s_format = '%Y/%m/%d %H:%M:%S'
+            newest_date = datetime.datetime.strptime(listAll[1][0], s_format)
+            for i in range(1, len(listAll)):
+                compare_data = (datetime.datetime.strptime(listAll[i][0], s_format))
+                if compare_data > newest_date:
+                    newest_date = compare_data
+            self.logger.debug(newest_date, self.last_updated_Input_sheet)
+            if newest_date == self.last_updated_Input_sheet:
                 return []
             else:
-                worksheet = sheet.get_worksheet(0)
-                self.last_updated_Input_sheet = last_Update
-                return worksheet.get_all_values()
+                self.last_updated_Input_sheet = newest_date
+                return listAll
+
         except gspread.exceptions.APIError:
             self.logger.warning("APIError in Load Spread Sheet")
             time.sleep(10)

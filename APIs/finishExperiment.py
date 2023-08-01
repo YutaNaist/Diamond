@@ -95,7 +95,7 @@ class FinishExperiment:
 
         dictReturnMsg = {}
         self._save_Experiment_information()
-        self._makeFilenamesLists()
+        # self._makeFilenamesLists()
         try:
             if self._moveExperimentResults():
                 self._makeUserInfoJson()

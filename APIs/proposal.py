@@ -252,12 +252,12 @@ class ProposalList:
             dictProposal["created_at"] = list_SpreadSheet[i][8]
             dictProposal["updated_at"] = list_SpreadSheet[i][8]
 
-            dictProposal["enable_status"] = list_SpreadSheet[i][14]
+            dictProposal["enable_status"] = list_SpreadSheet[i][18]
             dictProposal["is_used_now"] = False
             dictProposal["is_finished"] = False
-            dictProposal["url_for_edit"] = list_SpreadSheet[i][15]
+            dictProposal["url_for_edit"] = list_SpreadSheet[i][16]
 
-            created_ID = list_SpreadSheet[i][16]
+            created_ID = list_SpreadSheet[i][17]
             if created_ID == "" or created_ID == self.default_Experiment_ID:
                 created_ID = self.default_Experiment_ID
             dictProposal["id"] = created_ID

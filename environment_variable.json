@@ -13,7 +13,7 @@
     "setting_yaml_google_drive_api" : "Google_API_Keys/settings.yaml",
     "temp_generate_ID_json" : "temp_generate_ID.json",
     "instrument_database_json" : "instrument_ID_database.json",
-    "periodic_running_interval_second" : 60,
+    "periodic_running_interval_second" : 15,
     "periodic_running_starting" : {
         "hour" : 9,
         "minute" : 0,
