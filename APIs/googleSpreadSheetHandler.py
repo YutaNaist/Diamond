@@ -33,19 +33,22 @@ class GoogleSpreadSheetHandler:
             last_Update = sheet.lastUpdateTime
             worksheet = sheet.get_worksheet(0)
             #self.last_updated_Input_sheet = last_Update
-            listAll = worksheet.get_all_values()
+            list_All = worksheet.get_all_values()
+            self.logger.debug("load_All_Value_From_Input_Sheet" + str(list_All[1][0]))
             s_format = '%Y/%m/%d %H:%M:%S'
-            newest_date = datetime.datetime.strptime(listAll[1][0], s_format)
-            for i in range(1, len(listAll)):
-                compare_data = (datetime.datetime.strptime(listAll[i][0], s_format))
-                if compare_data > newest_date:
-                    newest_date = compare_data
-            self.logger.debug(newest_date, self.last_updated_Input_sheet)
+            newest_date = datetime.datetime.strptime(list_All[1][0], s_format)
+            for i in range(1, len(list_All)):
+                try:
+                    compare_data = (datetime.datetime.strptime(list_All[i][0], s_format))
+                    if compare_data > newest_date:
+                        newest_date = compare_data
+                except ValueError:
+                    pass
             if newest_date == self.last_updated_Input_sheet:
                 return []
             else:
                 self.last_updated_Input_sheet = newest_date
-                return listAll
+                return list_All
 
         except gspread.exceptions.APIError:
             self.logger.warning("APIError in Load Spread Sheet")
