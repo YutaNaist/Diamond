@@ -30,9 +30,9 @@ class GoogleSpreadSheetHandler:
                                         ) -> list:
         try:
             sheet = self.client.open_by_url(str_URL_Spread_Sheet)
-            last_Update = sheet.lastUpdateTime
+            # last_Update = sheet.lastUpdateTime
             worksheet = sheet.get_worksheet(0)
-            #self.last_updated_Input_sheet = last_Update
+            # self.last_updated_Input_sheet = last_Update
             list_All = worksheet.get_all_values()
             self.logger.debug("load_All_Value_From_Input_Sheet" + str(list_All[1][0]))
             s_format = '%Y/%m/%d %H:%M:%S'
