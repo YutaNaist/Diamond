@@ -37,10 +37,10 @@ class GoogleSpreadSheetHandler:
             s_format = '%Y/%m/%d %H:%M:%S'
             newest_date = datetime.datetime.strptime(listAll[1][0], s_format)
             for i in range(1, len(listAll)):
-                compare_data = (datetime.datetime.strptime(listAll[i][0], s_format))
+                compare_data = (datetime.datetime.strptime(
+                    listAll[i][0], s_format))
                 if compare_data > newest_date:
                     newest_date = compare_data
-            self.logger.debug(newest_date, self.last_updated_Input_sheet)
             if newest_date == self.last_updated_Input_sheet:
                 return []
             else:

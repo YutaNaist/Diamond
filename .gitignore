@@ -6,3 +6,4 @@ __pycache__
 environment_variable-copy*
 copyTest.bat
 saved_credentials.json
+run-diamond copy.bat
