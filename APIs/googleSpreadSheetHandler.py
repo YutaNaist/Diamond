@@ -7,9 +7,11 @@ import time
 
 class GoogleSpreadSheetHandler:
 
-    def __init__(self, str_Authorize_Json="", logger=None):
+    def __init__(self,
+                 str_Authorize_Json: str = "",
+                 logger: logging.Logger = None) -> None:
         if logger is None:
-            self.logger = logging.getLogger(__name__)
+            logger = logging.getLogger(__name__)
         else:
             self.logger = logger
         # str_ID_Spread_Sheet="",
@@ -20,19 +22,41 @@ class GoogleSpreadSheetHandler:
             self.str_Authorize_Json, scope)
         self.client = gspread.authorize(self.credential)
         self.last_updated_ID_List_Sheet = ""
+        self.last_updated_Input_sheet = ""
 
-    def load_All_Value_From_Spread_Sheet(self, str_ID_Spread_Sheet=""):
+    def load_All_Value_From_Input_Sheet(self,
+                                        str_URL_Spread_Sheet: str = ""
+                                        ) -> list:
         try:
-            sheet = self.client.open_by_key(str_ID_Spread_Sheet)
+            sheet = self.client.open_by_url(str_URL_Spread_Sheet)
+            last_Update = sheet.lastUpdateTime
+            if last_Update == self.last_updated_Input_sheet:
+                return []
+            else:
+                worksheet = sheet.get_worksheet(0)
+                self.last_updated_Input_sheet = last_Update
+                return worksheet.get_all_values()
+        except gspread.exceptions.APIError:
+            self.logger.warning("APIError in Load Spread Sheet")
+            time.sleep(10)
+            return self.load_All_Value_From_Input_Sheet(str_URL_Spread_Sheet)
+
+    def load_All_Value_From_Spread_Sheet(self,
+                                         str_URL_Spread_Sheet: str = ""
+                                         ) -> list:
+        try:
+            # sheet = self.client.open_by_key(str_ID_Spread_Sheet)
+            sheet = self.client.open_by_url(str_URL_Spread_Sheet)
             worksheet = sheet.get_worksheet(0)
             return worksheet.get_all_values()
         except gspread.exceptions.APIError:
             self.logger.warning("APIError in Load Spread Sheet")
             time.sleep(10)
-            return self.load_All_Value_From_Spread_Sheet(str_ID_Spread_Sheet)
+            return self.load_All_Value_From_Spread_Sheet(str_URL_Spread_Sheet)
 
-    def update_Spread_Sheet_IDs_From_Sheet(self, str_ID_Spread_Sheet):
-        sheet = self.client.open_by_key(str_ID_Spread_Sheet)
+    def update_Spread_Sheet_IDs_From_Sheet(self,
+                                           str_URL_Spread_Sheet: str) -> bool:
+        sheet = self.client.open_by_url(str_URL_Spread_Sheet)
         last_Update_Time = sheet.lastUpdateTime
         if last_Update_Time == self.last_updated_ID_List_Sheet:
             return True
@@ -40,13 +64,13 @@ class GoogleSpreadSheetHandler:
             try:
                 worksheet = sheet.get_worksheet(0)
                 data = worksheet.get_all_values()
-                self.list_ID_SpreadSheet_Input = []
-                self.list_ID_SpreadSheet_Brows = []
+                self.list_URL_SpreadSheet_Input = []
+                self.list_URL_SpreadSheet_Brows = []
                 self.list_last_update_Date_SpreadSheet = []
                 for i in range(len(data) - 1):
                     if data[i + 1][1] != "" and data[i + 1][2] != "":
-                        self.list_ID_SpreadSheet_Input.append(data[i + 1][1])
-                        self.list_ID_SpreadSheet_Brows.append(data[i + 1][2])
+                        self.list_URL_SpreadSheet_Input.append(data[i + 1][1])
+                        self.list_URL_SpreadSheet_Brows.append(data[i + 1][2])
                         self.list_last_update_Date_SpreadSheet.append("")
                 self.last_updated_ID_List_Sheet = last_Update_Time
                 return False
@@ -55,22 +79,22 @@ class GoogleSpreadSheetHandler:
                 # self.logger.warning("APIError in update IDs")
                 time.sleep(10)
                 return self.update_Spread_Sheet_IDs_From_Sheet(
-                    str_ID_Spread_Sheet)
+                    str_URL_Spread_Sheet)
 
-    def get_list_ID_Spread_Sheet_Input(self):
-        return self.list_ID_SpreadSheet_Input
+    def get_list_ID_Spread_Sheet_Input(self) -> list:
+        return self.list_URL_SpreadSheet_Input
 
-    def get_list_ID_Spread_Sheet_Brows(self):
-        return self.list_ID_SpreadSheet_Brows
+    def get_list_ID_Spread_Sheet_Brows(self) -> list:
+        return self.list_URL_SpreadSheet_Brows
 
-    def load_All_Value_From_Spread_Sheet_Input(self, index):
+    def load_All_Value_From_Spread_Sheet_Input(self, index: int) -> list:
         # print("Get Input")
         # print(self.list_last_update_Date_SpreadSheet[index])
-        str_ID_Spread_Sheet_Input = self.list_ID_SpreadSheet_Input[index]
+        str_URL_Spread_Sheet_Input = self.list_URL_SpreadSheet_Input[index]
         str_last_update_Spread_Sheet_Input = self.list_last_update_Date_SpreadSheet[
             index]
         try:
-            sheet = self.client.open_by_key(str_ID_Spread_Sheet_Input)
+            sheet = self.client.open_by_url(str_URL_Spread_Sheet_Input)
 
             last_Update = sheet.lastUpdateTime
             # print(last_Update)
@@ -113,24 +137,26 @@ class GoogleSpreadSheetHandler:
         worksheet.update_cells(cell_list)
     '''
 
-    def overwrite_2D_Array_To_Spread_Sheet(self, str_ID_Spread_Sheet,
-                                           str_Save_Range, list_All_Value):
+    def overwrite_2D_Array_To_Spread_Sheet(self, str_URL_Spread_Sheet: str,
+                                           str_Save_Range: str,
+                                           list_All_Value: list) -> None:
         try:
-            sheet = self.client.open_by_key(str_ID_Spread_Sheet)
+            sheet = self.client.open_by_URL(str_URL_Spread_Sheet)
             worksheet = sheet.get_worksheet(0)
             worksheet.update(str_Save_Range, list_All_Value)
         except gspread.exceptions.APIError:
-            self.logger.warning("APIError in overwrite spread sheet")
+            self.logger.warning(
+                "APIError in overwrite 2d array to spread sheet")
             # print(e)
             time.sleep(10)
-            self.overwrite_2D_Array_To_Spread_Sheet(self, str_ID_Spread_Sheet,
+            self.overwrite_2D_Array_To_Spread_Sheet(self, str_URL_Spread_Sheet,
                                                     str_Save_Range,
                                                     list_All_Value)
 
-    def overwrite_All_Value_To_Spread_Sheet(self, str_ID_Spread_Sheet,
-                                            list_All_Value):
+    def overwrite_All_Value_To_Spread_Sheet(self, str_URL_Spread_Sheet: str,
+                                            list_All_Value: list) -> None:
         try:
-            sheet = self.client.open_by_key(str_ID_Spread_Sheet)
+            sheet = self.client.open_by_url(str_URL_Spread_Sheet)
             worksheet = sheet.get_worksheet(0)
             len_Original_Rows = worksheet.row_count
 
@@ -145,17 +171,19 @@ class GoogleSpreadSheetHandler:
                     list_All_Value.append(blank_Row)
             worksheet.update(worksheet_range, list_All_Value)
         except gspread.exceptions.APIError:
-            self.logger.warning("APIError in overwrite spread sheet")
+            self.logger.warning(
+                "APIError in overwrite all value to spread sheet")
             # print(e)
             time.sleep(10)
-            self.overwrite_All_Value_To_Spread_Sheet(str_ID_Spread_Sheet)
+            self.overwrite_All_Value_To_Spread_Sheet(str_URL_Spread_Sheet)
 
-    def overwrite_All_Value_To_Spread_Sheet_Brows(self, index, list_All_Value):
+    def overwrite_All_Value_To_Spread_Sheet_Brows(
+            self, index: int, list_All_Value: list) -> None:
         # print("over write Brows")
-        str_ID_Spread_Sheet = self.list_ID_SpreadSheet_Brows[index]
+        str_URL_Spread_Sheet = self.list_URL_SpreadSheet_Brows[index]
         # print(index, "check1")
         try:
-            sheet = self.client.open_by_key(str_ID_Spread_Sheet)
+            sheet = self.client.open_by_url(str_URL_Spread_Sheet)
             # print(index, "check2")
             worksheet = sheet.get_worksheet(0)
             len_Original_Rows = worksheet.row_count
@@ -173,20 +201,20 @@ class GoogleSpreadSheetHandler:
                     list_All_Value.append(blank_Row)
             worksheet.update(worksheet_range, list_All_Value)
             # print(index, "check6")
-            return 0
         except gspread.exceptions.APIError:
             self.logger.warning("APIError in overwrite spread sheet Brwos")
             # print(e)
             time.sleep(10)
             # print("resend")
-            return self.overwrite_All_Value_To_Spread_Sheet_Brows(
+            self.overwrite_All_Value_To_Spread_Sheet_Brows(
                 index, list_All_Value)
 
-    def overwrite_ID_Value_To_Spread_Sheet(self, index, list_All_ID, int_Col):
-        str_ID_Spread_Sheet = self.list_ID_SpreadSheet_Input[index]
+    def overwrite_ID_Value_To_Spread_Sheet(self, index: int, list_All_ID: list,
+                                           int_Col: int) -> None:
+        str_URL_Spread_Sheet = self.list_URL_SpreadSheet_Input[index]
         # print("over write ID")
         try:
-            sheet = self.client.open_by_key(str_ID_Spread_Sheet)
+            sheet = self.client.open_by_url(str_URL_Spread_Sheet)
             worksheet = sheet.get_worksheet(0)
 
             list_ID_Save = []
@@ -197,8 +225,8 @@ class GoogleSpreadSheetHandler:
                 int_Col) + str(row_last + 2)
             worksheet.update(worksheet_range, list_ID_Save)
 
-            str_ID_Spread_Sheet = self.list_ID_SpreadSheet_Input[index]
-            sheet = self.client.open_by_key(str_ID_Spread_Sheet)
+            str_ID_Spread_Sheet = self.list_URL_SpreadSheet_Input[index]
+            sheet = self.client.open_by_url(str_ID_Spread_Sheet)
             update_Time = sheet.lastUpdateTime
             self.list_last_update_Date_SpreadSheet[index] = update_Time
         except gspread.exceptions.APIError:
@@ -209,7 +237,7 @@ class GoogleSpreadSheetHandler:
             self.overwrite_ID_Value_To_Spread_Sheet(index, list_All_ID,
                                                     int_Col)
 
-    def toAlpha(self, num):
+    def toAlpha(self, num: int) -> str:
         if num <= 26:
             return chr(64 + num)
         elif num % 26 == 0:
@@ -217,10 +245,10 @@ class GoogleSpreadSheetHandler:
         else:
             return self.toAlpha(num // 26) + chr(64 + num % 26)
 
-    def set_Last_Update_Input(self, index):
-        str_ID_Spread_Sheet = self.list_ID_SpreadSheet_Input[index]
+    def set_Last_Update_Input(self, index: int) -> None:
+        str_URL_Spread_Sheet = self.list_URL_SpreadSheet_Input[index]
         try:
-            sheet = self.client.open_by_key(str_ID_Spread_Sheet)
+            sheet = self.client.open_by_url(str_URL_Spread_Sheet)
             update_Time = sheet.lastUpdateTime
             self.list_last_update_Date_SpreadSheet[index] = update_Time
         except gspread.exceptions.APIError:
@@ -228,3 +256,14 @@ class GoogleSpreadSheetHandler:
             # print(e)
             time.sleep(10)
             self.set_Last_Update_Input(index)
+
+
+if __name__ == "__main__":
+    import json
+    environmentValuable = json("environment_variable-copy.json")
+    gsHandler = GoogleSpreadSheetHandler(
+        environmentValuable["database_directory"] +
+        environmentValuable["authorize_json_google_api"],
+        logger=None)
+    gsHandler.update_Spread_Sheet_IDs_From_Sheet(
+        environmentValuable["api_key_spreadsheet_list"])

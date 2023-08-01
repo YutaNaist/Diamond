@@ -12,27 +12,28 @@ import logging
 
 
 class CommandsDiamond:
-    def __init__(self, logger=None, environment_Variable=None):
+
+    def __init__(self, logger=None, dict_Environment_Variable=None):
         if logger is None:
             self.logger = logging.getLogger(__name__)
         else:
             self.logger = logger
-        if environment_Variable is None:
-            self.environment_Variable = {}
+        if dict_Environment_Variable is None:
+            self.dict_Environment_Variable = {}
             self.read_environment_variable()
         else:
-            self.environment_Variable = environment_Variable
+            self.dict_Environment_Variable = dict_Environment_Variable
 
     def set_Google_Auth_For_Drive(self, google_Auth_For_Drive):
         self.google_Auth_For_Drive = google_Auth_For_Drive
         # logger(self.google_Auth_For_Drive)
 
     def read_environment_variable(self):
-        self.environment_Variable = json.load(
+        self.dict_Environment_Variable = json.load(
             open("C:/diamond/environment_variable.json",
                  mode="r",
                  encoding='utf-8'))
-        # self.environment_Variable[]
+        # self.dict_Environment_Variable[]
 
     def check_UsageID(self, command, args, identifier):
         # コマンドとargsを両方とも受け取って。コマンドがあっていない場合にfalseを返す。
@@ -44,16 +45,16 @@ class CommandsDiamond:
             return None
         experiment_ID = args['experiment_id']
         checkIDExecuter = checkID(
-            dict_Environment_Variable=self.environment_Variable)
+            dict_Environment_Variable=self.dict_Environment_Variable)
         """
         # checkIDExecuter.setDatabaseFilename(
-        #     self.environment_Variable["database_user_information_json_loading"]
+        #     self.dict_Environment_Variable["database_user_information_json_loading"]
         # )
         # checkIDExecuter.set_Data_Directory(
-        #     self.environment_Variable["storage_directory"],
-        #     self.environment_Variable["proposal_directory"])
+        #     self.dict_Environment_Variable["storage_directory"],
+        #     self.dict_Environment_Variable["proposal_directory"])
         # checkIDExecuter.set_ID_Filename(
-        #     self.environment_Variable["database_user_id_json_loading"])
+        #     self.dict_Environment_Variable["database_user_id_json_loading"])
         # checkIDExecuter.loadDatabase()
         """
         dictReturnMsg = checkIDExecuter.check_ID_Is_Exists(experiment_ID)
@@ -77,7 +78,7 @@ class CommandsDiamond:
             experiment_ID=experiment_ID,
             share_Directory=strShareDirectory,
             list_File_Names=listFilleNames,
-            dict_Environment_Variable=self.environment_Variable,
+            dict_Environment_Variable=self.dict_Environment_Variable,
             google_Auth_For_Drive=self.google_Auth_For_Drive,
             logger=self.logger)
 
@@ -98,22 +99,26 @@ class CommandsDiamond:
 
     def periodic_Update_Spread_Sheet(self):
         periodicUpdateExecutor = PeriodicUpdate(
-            self.logger, dict_Environment_Variable=self.environment_Variable)
+            self.logger,
+            dict_Environment_Variable=self.dict_Environment_Variable,
+            Google_Auth_For_Drive=self.google_Auth_For_Drive)
         # periodicUpdateExecutor.set_logger(self.logger)
         periodicUpdateExecutor.runSchedule()
 
+    '''
     def check_And_Get_Single_Proposal(self, command, args, identifier):
         if command != 'Check_And_Get_Single_Proposal':
             return None
         usageID = args['experiment_id']
         checkAndGetSingleProposalExecuter = CheckAndGetSingleProposal()
         checkAndGetSingleProposalExecuter.setProposalDirectory(
-            self.environment_Variable["proposal_directory"])
+            self.dict_Environment_Variable["proposal_directory"])
         dictReturnMsg = checkAndGetSingleProposalExecuter.checkAndGetSingleProposal(
             usageID)
         dictReturnMsg["command"] = command
         dictReturnMsg["identifier"] = identifier
         return dictReturnMsg
+    '''
 
     def start_Experiment(self, command, args, identifier):
         if command != 'Start_Experiment':
@@ -121,13 +126,13 @@ class CommandsDiamond:
         experiment_ID = args['experiment_id']
         startExperimentExecuter = StartExperiment(
             str_Experiment_ID=experiment_ID,
-            dict_Environment_Variable=self.environment_Variable)
+            dict_Environment_Variable=self.dict_Environment_Variable)
         '''
         # startExperimentExecuter.set_Proposal_List_Filename(
-        #     self.environment_Variable["database_proposal_list_json_loading"])
+        #     self.dict_Environment_Variable["database_proposal_list_json_loading"])
         # startExperimentExecuter.set_UsageID(usageID)
         # startExperimentExecuter.set_Saving_Directory(
-        # self.environment_Variable["storage_directory"])
+        # self.dict_Environment_Variable["storage_directory"])
         '''
         dictReturnMsg = startExperimentExecuter.start_Experiment()
         dictReturnMsg["command"] = command
@@ -141,7 +146,7 @@ class CommandsDiamond:
         getMetaDataExecuter = GetMetaData()
         getMetaDataExecuter.set_UsageID(usageID)
         getMetaDataExecuter.set_Storage_Directory(
-            self.environment_Variable["storage_directory"])
+            self.dict_Environment_Variable["storage_directory"])
         dictReturnMsg = getMetaDataExecuter.getMetaData(usageID)
         dictReturnMsg["command"] = command
         dictReturnMsg["identifier"] = identifier
@@ -152,11 +157,13 @@ class CommandsDiamond:
             return None
         experiment_ID = args['experiment_id']
         share_Directory = args['storagePC_share_directory']
-        copy_Original_Executer = Copy_From_Original_To_Share()
-        copy_Original_Executer.set_Experiment_ID(experiment_ID)
-        copy_Original_Executer.set_Storage_Directory(
-            self.environment_Variable["storage_directory"])
-        copy_Original_Executer.set_Share_Directory(share_Directory)
+        copy_Original_Executer = Copy_From_Original_To_Share(
+            experiment_ID, self.dict_Environment_Variable["storage_directory"],
+            share_Directory)
+        # copy_Original_Executer.set_Experiment_ID(experiment_ID)
+        # copy_Original_Executer.set_Storage_Directory(
+        #     self.dict_Environment_Variable["storage_directory"])
+        # copy_Original_Executer.set_Share_Directory(share_Directory)
         dictReturnMsg = {}
         # dictReturnMsg["args"] = {"experiment_information": {}}
         dictReturnMsg = copy_Original_Executer.copy_Original_To_Share()

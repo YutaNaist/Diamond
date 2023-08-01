@@ -5,9 +5,13 @@ import os
 import glob
 import shutil
 import json
+# import multiprocessing
+# from multiprocessing import Process
+import threading
 
 
 class FinishExperiment:
+
     def __init__(self,
                  experiment_ID="",
                  share_Directory="",
@@ -33,11 +37,14 @@ class FinishExperiment:
         self.list_File_Names = list_File_Names
         if dict_Environment_Variable != {}:
             self.jsonFileName = dict_Environment_Variable[
-                "database_user_information_json_loading"]
+                "database_directory"] + dict_Environment_Variable[
+                    "database_user_information_json_loading"]
             self.str_API_Key_Drive = dict_Environment_Variable[
-                "authorization_json_google_drive_api"]
+                "database_directory"] + dict_Environment_Variable[
+                    "authorization_json_google_drive_api"]
             self.str_Setting_Yaml = dict_Environment_Variable[
-                "setting_yaml_google_drive_api"]
+                "database_directory"] + dict_Environment_Variable[
+                    "setting_yaml_google_drive_api"]
 
             self.str_Storage_Directory = dict_Environment_Variable[
                 "storage_directory"]
@@ -93,7 +100,17 @@ class FinishExperiment:
             if self._moveExperimentResults():
                 self._makeUserInfoJson()
                 self._makeMetaDataJsons()
-                self._up_load_to_Google()
+
+                # self._up_load_to_Google()
+                if self.is_Share_With_Google is True:
+                    thread_upload = threading.Thread(
+                        target=self._up_load_to_Google)
+                    thread_upload.daemon = True
+                    thread_upload.start()
+                    # process_upload = Process(target=self._up_load_to_Google,
+                    #                          args=())
+                    # process_upload.start()
+
                 dictReturnMsg["status"] = True
                 dictReturnMsg["message"] = "Success"
             else:
@@ -183,8 +200,7 @@ class FinishExperiment:
         self.current_Proposal.setProposalInformationValue("is_finished", True)
         self.current_Proposal.setProposalInformationValue("is_used_now", False)
         dict_Current_Proposal = self.current_Proposal.getDictProposal()
-        if "Upload to Google" in dict_Current_Proposal["data_delivery"][
-                "status"]:
+        if dict_Current_Proposal["data_delivery"]["status"][0] == "1":
             self.is_Share_With_Google = True
             self.str_Share_Google_Address = dict_Current_Proposal[
                 "data_delivery"]["gmail_address"]

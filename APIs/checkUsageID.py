@@ -3,6 +3,7 @@ import json
 
 
 class checkID:
+
     def __init__(self, dict_Environment_Variable={}):
         # self._strDataBaseFilename = ""
         if dict_Environment_Variable != {}:
@@ -11,7 +12,8 @@ class checkID:
             self.str_Proposal_Directory = dict_Environment_Variable[
                 "proposal_directory"]
             self.str_IDs_Filename = dict_Environment_Variable[
-                "database_user_id_json_loading"]
+                "database_directory"] + dict_Environment_Variable[
+                    "database_user_id_json_loading"]
 
     def loadDatabase(self):
         self.proposalListCurrentList = ProposalList()
@@ -32,6 +34,7 @@ class checkID:
     def check_ID_Is_Exists(self, str_Experiment_ID):
         dictReturnMessage = {}
         IDs = json.load(open(self.str_IDs_Filename, mode="r"))
+        print(IDs)
         proposal = Proposal()
         if not (str_Experiment_ID in IDs):
             dictReturnMessage["status"] = False
@@ -52,7 +55,7 @@ class checkID:
                 elif proposal.getIsUsed() is True:
                     dictReturnMessage["status"] = False
                     dictReturnMessage[
-                        "message"] = "Error: This Experiment ID is used in other place."
+                        "message"] = "Warning: This Experiment ID is used in other place!"
                     returnArgs = {}
                     returnArgs["database"] = proposal.getDictProposal()
                     dictReturnMessage["args"] = returnArgs

@@ -7,7 +7,10 @@ import logging
 # import time
 # import random
 
-from APIs.googleSpreadSheetHandler import GoogleSpreadSheetHandler
+try:
+    from APIs.googleSpreadSheetHandler import GoogleSpreadSheetHandler
+except ModuleNotFoundError:
+    from googleSpreadSheetHandler import GoogleSpreadSheetHandler
 
 
 class ErrorProposal(Exception):
@@ -15,6 +18,7 @@ class ErrorProposal(Exception):
 
 
 class Proposal():
+
     def __init__(self, logger=None):
         if logger is None:
             self.logger = logging.getLogger(__name__)
@@ -23,7 +27,7 @@ class Proposal():
         self._listKeys = [
             "id", "index", "creators", "contact", "instrument",
             "experiment_date", "data_delivery", "arim_upload", "updated_at",
-            "enable_status", "is_used_now", "is_finished"
+            "enable_status", "is_used_now", "is_finished", "url_for_edit"
         ]
         self._dictProposal = {}
         pass
@@ -84,6 +88,7 @@ class Proposal():
 
 
 class ProposalList:
+
     def __init__(self,
                  str_Authorize_Json="",
                  google_Spread_Sheet_Handler=None,
@@ -162,6 +167,103 @@ class ProposalList:
             if dict_Proposal["enable_status"] == "Disable" or dict_Proposal[
                     "id"] == self.default_Experiment_ID:
                 self.delete_Proposal(i)
+
+    def load_From_SpreadSheet_Input(self,
+                                    str_url_spreadsheet_input="",
+                                    dict_Instrument_ID={}):
+        bool_Flag_Updated = False
+        self.logger.debug("Start Load From Spread Sheet")
+        all_Value_Spread_Sheet = self.google_Spread_Sheet_Handler.load_All_Value_From_Input_Sheet(
+            str_url_spreadsheet_input)
+        if all_Value_Spread_Sheet != []:
+            bool_Flag_Updated = True
+            list_Dict_Spread_Sheet, list_ID_SpreadSheet = self.translate_SpreadSheet_To_Dict(
+                all_Value_Spread_Sheet, dict_Instrument_ID)
+            for k, dict_Spread_Sheet in enumerate(list_Dict_Spread_Sheet):
+                # str_ID = list_ID_SpreadSheet[i]
+                self.update_Proposal_By_Dict(dict_Spread_Sheet)
+            self.delete_Proposals_Checking_Enable_Status()
+        return bool_Flag_Updated
+
+    def translate_SpreadSheet_To_Dict(self,
+                                      list_SpreadSheet,
+                                      dict_instrument_id={}):
+        # keys = list_SpreadSheet[0]
+        listDictProposals = []
+        list_ID = []
+        for i in range(1, len(list_SpreadSheet)):
+            if (list_SpreadSheet[i][0]) == "":
+                continue
+            dictProposal = {}
+            # dictProposal["index"] = dictExcelFile["Index"]
+            dictProposal["index"] = 0
+
+            dictProposal["creators"] = []
+
+            dictParson = {}
+            dictParson["name"] = list_SpreadSheet[i][2]
+            dictParson["email"] = list_SpreadSheet[i][3]
+            dictParson["affiliation"] = list_SpreadSheet[i][4]
+            dictProposal["creators"].append(dictParson)
+
+            dictContact = {}
+
+            dictContact["email"] = list_SpreadSheet[i][2]
+            dictContact["phone_number"] = list_SpreadSheet[i][5]
+            dictContact["address"] = list_SpreadSheet[i][6]
+            dictProposal["contact"] = dictContact
+
+            dictInstrument = {}
+            dictInstrument["name"] = list_SpreadSheet[i][7]
+            try:
+                dictInstrument["identifier"] = dict_instrument_id[
+                    list_SpreadSheet[i][7]]
+            except KeyError:
+                dictInstrument["identifier"] = "NR-000"
+            dictProposal["instrument"] = dictInstrument
+
+            dictExperimentDate = {}
+
+            dictExperimentDate["start_date"] = list_SpreadSheet[i][8].split(
+                " ")[0]
+            dictExperimentDate["start_time"] = list_SpreadSheet[i][8].split(
+                " ")[-1]
+            dictExperimentDate["end_date"] = list_SpreadSheet[i][9].split(
+                " ")[0]
+            dictExperimentDate["end_time"] = list_SpreadSheet[i][9].split(
+                " ")[-1]
+            dictProposal["experiment_date"] = dictExperimentDate
+
+            dictDataDelivery = {}
+            dictDataDelivery["status"] = list_SpreadSheet[i][12]
+            dictDataDelivery["gmail_address"] = list_SpreadSheet[i][13]
+            if list_SpreadSheet[i][12][0] == "1":
+                dictDataDelivery["is_share_with_google"] = True
+            else:
+                dictDataDelivery["is_share_with_google"] = False
+            dictProposal["data_delivery"] = dictDataDelivery
+
+            dictARIMUpload = {}
+            dictARIMUpload["status"] = list_SpreadSheet[i][10]
+            dictARIMUpload["id"] = list_SpreadSheet[i][11]
+            dictARIMUpload["uploaded"] = False
+            dictProposal["arim_upload"] = dictARIMUpload
+
+            dictProposal["created_at"] = list_SpreadSheet[i][8]
+            dictProposal["updated_at"] = list_SpreadSheet[i][8]
+
+            dictProposal["enable_status"] = list_SpreadSheet[i][14]
+            dictProposal["is_used_now"] = False
+            dictProposal["is_finished"] = False
+            dictProposal["url_for_edit"] = list_SpreadSheet[i][15]
+
+            created_ID = list_SpreadSheet[i][16]
+            if created_ID == "" or created_ID == self.default_Experiment_ID:
+                created_ID = self.default_Experiment_ID
+            dictProposal["id"] = created_ID
+            list_ID.append(dictProposal["id"])
+            listDictProposals.append(dictProposal)
+        return listDictProposals, list_ID
 
     def load_From_SpreadSheet_List(self,
                                    list_generate_ID=[1, 0],
@@ -338,7 +440,7 @@ class ProposalList:
         listColumns = [
             "Experiment ID", "User Name", "Instrument", "Instrument ID",
             "Start Date", "End Date", "Contact Information", "Data Delivery",
-            "GMail Account", "ARIM Upload", "ARIM ID"
+            "GMail Account", "ARIM Upload", "ARIM ID", "URL For Edit"
         ]
         listSave = []
         listSave.append(listColumns)
@@ -381,6 +483,10 @@ class ProposalList:
                 dict_Proposal["data_delivery"]["gmail_address"])
             listSaveSingle.append(dict_Proposal["arim_upload"]["status"])
             listSaveSingle.append(dict_Proposal["arim_upload"]["id"])
+            try:
+                listSaveSingle.append(dict_Proposal["url_for_edit"])
+            except KeyError:
+                listSaveSingle.append("")
             listSave.append(listSaveSingle)
 
         int_Len_ID_SpreadSheet = len(list_Str_ID_Brows_Spread_Sheet)
@@ -439,53 +545,6 @@ class ProposalList:
             if proposal.getIsEnable() and id != "0000-000-000001":
                 listIDs.append()
         return listIDs
-
-    """
-    def loadFromExcel(self, strFilenameExcel_):
-        try:
-            # dfExcelFile = pandas.read_excel(strFilenameExcel_)
-            dfExcelFile = self.excelToPandasDataFrame(strFilenameExcel_)
-        except PermissionError:
-            return False
-        listDictExcelFile = self.translateFromDataFrameToDict(dfExcelFile)
-        for dictExcelFile in listDictExcelFile:
-            self.updateProposalByDict(dictExcelFile)
-        self.deleteProposalsCheckingEnableStatus()
-        return True
-    # def excelToPandasDataFrame(self, filename):
-    #     workBook = openpyxl.load_workbook(filename, data_only=True)
-    #     dataAll = []
-    #     for row in workBook["main sheet"].iter_rows():
-    #         data = []
-    #         for cell in row:
-    #             data.append(cell.value)
-    #         dataAll.append(data)
-    #     return pandas.DataFrame(dataAll[1:], columns=dataAll[0])
-    def loadIDListOfSpreadSheet(self):
-        scope = ['https://www.googleapis.com/auth/drive']
-        credential = ServiceAccountCredentials.from_json_keyfile_name(
-            self.str_Authorize_Json, scope)
-        client = gspread.authorize(credential)
-        worksheet = client.open_by_key(
-            self.strIdOfSpreadsheetIDList).get_worksheet(0)
-        data = worksheet.get_all_values()
-        # data = pandas.DataFrame(worksheet.get_all_values())
-        # self.listIDsSpreadSheet = []
-        list_ID_SpreadSheet_Input = []
-        list_ID_SpreadSheet_Brows = []
-        list_index_SpreadSheet = []
-        for i in range(len(data) - 1):
-            list_ID_SpreadSheet_Input.append(data[i + 1][1])
-            list_ID_SpreadSheet_Brows.append(data[i + 1][2])
-            list_index_SpreadSheet.append(data[i + 1][3])
-        return [
-            list_ID_SpreadSheet_Input, list_ID_SpreadSheet_Brows,
-            list_index_SpreadSheet
-        ]
-        # for cell in data[0]:
-        #     self.listIDsSpreadSheet.append(cell)
-        # return self.listIDsSpreadSheet
-    """
 
 
 # %%

@@ -3,6 +3,7 @@ import APIs.proposal as proposal
 
 
 class StartExperiment:
+
     def __init__(self, str_Experiment_ID="", dict_Environment_Variable={}):
         self.str_Experiment_ID = str_Experiment_ID
 
@@ -42,8 +43,8 @@ class StartExperiment:
             return {"status": False, "message": "Failed making directory"}
 
         current_Proposal.setProposalInformationValue("is_used_now", True)
-        print(current_Proposal.getDictProposal())
-        print(self.str_Proposal_File)
+        # print(current_Proposal.getDictProposal())
+        # print(self.str_Proposal_File)
         current_Proposal.saveSingleProposal(self.str_Proposal_File)
         return {"status": True, "message": "Success"}
 

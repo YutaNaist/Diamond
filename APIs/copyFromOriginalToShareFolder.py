@@ -5,6 +5,15 @@ import shutil
 
 
 class Copy_From_Original_To_Share:
+
+    def __init__(self,
+                 str_Experiment_ID: str = "",
+                 str_Storage_Directory: str = "",
+                 str_Share_Directory: str = ""):
+        self.str_Experiment_ID = str_Experiment_ID
+        self.str_Storage_Directory = str_Storage_Directory
+        self.str_Share_Directory = str_Share_Directory
+
     def set_Experiment_ID(self, str_Experiment_ID):
         self.str_Experiment_ID = str_Experiment_ID
 
@@ -17,17 +26,17 @@ class Copy_From_Original_To_Share:
     def copy_Original_To_Share(self,
                                str_Experiment_ID="",
                                str_Share_Directory=""):
-        if str_Experiment_ID != "":
-            self.str_Experiment_ID = str_Experiment_ID
-        if str_Share_Directory != "":
-            self.str_Share_Directory = str_Share_Directory
+        # if str_Experiment_ID != "":
+        #     self.str_Experiment_ID = str_Experiment_ID
+        # if str_Share_Directory != "":
+        #     self.str_Share_Directory = str_Share_Directory
 
         dictReturnMessage = {}
         metaDataList = MetaDataList()
-        metaDataList.set_Str_Usage_ID(self.str_Experiment_ID)
+        metaDataList.set_Str_Experiment_ID(self.str_Experiment_ID)
         metaDataList.set_Str_Data_Directory(self.str_Storage_Directory)
-        metaDataList.load_File_List_From_File()
-        list_File_Names = metaDataList.get_List_File_Name()
+        list_File_Names = metaDataList.load_File_List_From_File()
+        # list_File_Names = metaDataList.get_List_File_Name()
         if list_File_Names == []:
             dict_Experiment_Information = metaDataList.get_Experiment_Information(
             )
