@@ -50,20 +50,29 @@ class Copy_From_Original_To_Share:
             )
             # metaDataList.load_All_Meta_From_File_List()
             for file_name in list_File_Names:
-                data_directory = self.str_Storage_Directory + "/{}/{}/data/".format(
+                data_directory = self.str_Storage_Directory + "{}/{}/data/".format(
                     self.str_Experiment_ID, self.str_Experiment_ID)
                 file_directory = data_directory + file_name
+                print(file_name)
                 try:
-                    if os.path.isfile(file_directory):
-                        shutil.copy(
-                            file_directory, self.str_Share_Directory +
-                            file_directory[len(data_directory):])
-                    else:
+                    if os.path.isdir(file_directory):
                         try:
                             os.makedirs(self.str_Share_Directory + file_name,
                                         exist_ok=True)
                         except FileExistsError:
                             pass
+                    else:
+                        only_file_name = os.path.basename(file_directory)
+                        try:
+                            os.makedirs(self.str_Share_Directory +
+                            file_directory[len(data_directory):-1*len(only_file_name)],
+                                        exist_ok=True)
+                        except FileExistsError:
+                            pass
+                        shutil.copy(
+                            file_directory, self.str_Share_Directory +
+                            file_directory[len(data_directory):])
+
                 except FileNotFoundError:
                     pass
             dictReturnMessage["status"] = True

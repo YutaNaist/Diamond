@@ -188,85 +188,87 @@ class ProposalList:
     def translate_SpreadSheet_To_Dict(self,
                                       list_SpreadSheet,
                                       dict_instrument_id={}):
-        try:
-            # keys = list_SpreadSheet[0]
-            listDictProposals = []
-            list_ID = []
-            for i in range(1, len(list_SpreadSheet)):
-                if (list_SpreadSheet[i][0]) == "":
-                    continue
-                dictProposal = {}
-                # dictProposal["index"] = dictExcelFile["Index"]
-                dictProposal["index"] = 0
 
-                dictProposal["creators"] = []
+        # keys = list_SpreadSheet[0]
+        listDictProposals = []
+        list_ID = []
+        for i in range(1, len(list_SpreadSheet)):
+            try:
+                s_format = '%Y/%m/%d %H:%M:%S'
+                newest_date = datetime.datetime.strptime(list_SpreadSheet[i][0], s_format)
+            except ValueError:
+                continue
+            #if (list_SpreadSheet[i][0]) == "":
+            dictProposal = {}
+            # dictProposal["index"] = dictExcelFile["Index"]
+            dictProposal["index"] = 0
 
-                dictParson = {}
-                dictParson["name"] = list_SpreadSheet[i][2]
-                dictParson["email"] = list_SpreadSheet[i][3]
-                dictParson["affiliation"] = list_SpreadSheet[i][4]
-                dictProposal["creators"].append(dictParson)
+            dictProposal["creators"] = []
 
-                dictContact = {}
+            dictParson = {}
+            dictParson["name"] = list_SpreadSheet[i][2]
+            dictParson["email"] = list_SpreadSheet[i][3]
+            dictParson["affiliation"] = list_SpreadSheet[i][4]
+            dictProposal["creators"].append(dictParson)
 
-                dictContact["email"] = list_SpreadSheet[i][2]
-                dictContact["phone_number"] = list_SpreadSheet[i][5]
-                dictContact["address"] = list_SpreadSheet[i][6]
-                dictProposal["contact"] = dictContact
+            dictContact = {}
 
-                dictInstrument = {}
-                dictInstrument["name"] = list_SpreadSheet[i][7]
-                try:
-                    dictInstrument["identifier"] = dict_instrument_id[
-                        list_SpreadSheet[i][7]]
-                except KeyError:
-                    dictInstrument["identifier"] = "NR-000"
-                dictProposal["instrument"] = dictInstrument
+            dictContact["email"] = list_SpreadSheet[i][2]
+            dictContact["phone_number"] = list_SpreadSheet[i][5]
+            dictContact["address"] = list_SpreadSheet[i][6]
+            dictProposal["contact"] = dictContact
 
-                dictExperimentDate = {}
+            dictInstrument = {}
+            dictInstrument["name"] = list_SpreadSheet[i][7]
+            try:
+                dictInstrument["identifier"] = dict_instrument_id[
+                    list_SpreadSheet[i][7]]
+            except KeyError:
+                dictInstrument["identifier"] = "NR-000"
+            dictProposal["instrument"] = dictInstrument
 
-                dictExperimentDate["start_date"] = list_SpreadSheet[i][8].split(
-                    " ")[0]
-                dictExperimentDate["start_time"] = list_SpreadSheet[i][8].split(
-                    " ")[-1]
-                dictExperimentDate["end_date"] = list_SpreadSheet[i][9].split(
-                    " ")[0]
-                dictExperimentDate["end_time"] = list_SpreadSheet[i][9].split(
-                    " ")[-1]
-                dictProposal["experiment_date"] = dictExperimentDate
+            dictExperimentDate = {}
 
-                dictDataDelivery = {}
-                dictDataDelivery["status"] = list_SpreadSheet[i][12]
-                dictDataDelivery["gmail_address"] = list_SpreadSheet[i][13]
-                if list_SpreadSheet[i][12][0] == "1":
-                    dictDataDelivery["is_share_with_google"] = True
-                else:
-                    dictDataDelivery["is_share_with_google"] = False
-                dictProposal["data_delivery"] = dictDataDelivery
+            dictExperimentDate["start_date"] = list_SpreadSheet[i][8].split(
+                " ")[0]
+            dictExperimentDate["start_time"] = list_SpreadSheet[i][8].split(
+                " ")[-1]
+            dictExperimentDate["end_date"] = list_SpreadSheet[i][9].split(
+                " ")[0]
+            dictExperimentDate["end_time"] = list_SpreadSheet[i][9].split(
+                " ")[-1]
+            dictProposal["experiment_date"] = dictExperimentDate
 
-                dictARIMUpload = {}
-                dictARIMUpload["status"] = list_SpreadSheet[i][10]
-                dictARIMUpload["id"] = list_SpreadSheet[i][11]
-                dictARIMUpload["uploaded"] = False
-                dictProposal["arim_upload"] = dictARIMUpload
+            dictDataDelivery = {}
+            dictDataDelivery["status"] = list_SpreadSheet[i][12]
+            dictDataDelivery["gmail_address"] = list_SpreadSheet[i][13]
+            if list_SpreadSheet[i][12][0] == "1":
+                dictDataDelivery["is_share_with_google"] = True
+            else:
+                dictDataDelivery["is_share_with_google"] = False
+            dictProposal["data_delivery"] = dictDataDelivery
 
-                dictProposal["created_at"] = list_SpreadSheet[i][8]
-                dictProposal["updated_at"] = list_SpreadSheet[i][8]
+            dictARIMUpload = {}
+            dictARIMUpload["status"] = list_SpreadSheet[i][10]
+            dictARIMUpload["id"] = list_SpreadSheet[i][11]
+            dictARIMUpload["uploaded"] = False
+            dictProposal["arim_upload"] = dictARIMUpload
 
-                dictProposal["enable_status"] = list_SpreadSheet[i][18]
-                dictProposal["is_used_now"] = False
-                dictProposal["is_finished"] = False
-                dictProposal["url_for_edit"] = list_SpreadSheet[i][16]
+            dictProposal["created_at"] = list_SpreadSheet[i][8]
+            dictProposal["updated_at"] = list_SpreadSheet[i][8]
 
-                created_ID = list_SpreadSheet[i][17]
-                if created_ID == "" or created_ID == self.default_Experiment_ID:
-                    created_ID = self.default_Experiment_ID
-                dictProposal["id"] = created_ID
-                list_ID.append(dictProposal["id"])
-                listDictProposals.append(dictProposal)
+            dictProposal["enable_status"] = list_SpreadSheet[i][18]
+            dictProposal["is_used_now"] = False
+            dictProposal["is_finished"] = False
+            dictProposal["url_for_edit"] = list_SpreadSheet[i][16]
+
+            created_ID = list_SpreadSheet[i][17]
+            if created_ID == "" or created_ID == self.default_Experiment_ID:
+                created_ID = self.default_Experiment_ID
+            dictProposal["id"] = created_ID
+            list_ID.append(dictProposal["id"])
+            listDictProposals.append(dictProposal)
             return listDictProposals, list_ID
-        except BaseException:
-            return [], []
 
     def load_From_SpreadSheet_List(self,
                                    list_generate_ID=[1, 0],

@@ -5,6 +5,8 @@ import logging
 import datetime
 import time
 
+class GoogleSpreadSheetHandlerException(Exception):
+    pass
 
 class GoogleSpreadSheetHandler:
 
