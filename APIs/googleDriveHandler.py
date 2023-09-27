@@ -47,6 +47,9 @@ class GoogleDriveHandler:
                 {
                     "title": folder_name,
                     "mimeType": "application/vnd.google-apps.folder",
+                    "parents": [
+                        {"id": "1V3NRaZKANmpythm5AG8DBAvbaWDsNIj3"},
+                    ],
                 }
             )
         else:
@@ -100,7 +103,6 @@ class GoogleDriveHandler:
         folder = self.create_folder_Force(upload_Dir_Name, folder_ID)
 
         folder_id = folder["id"]
-
         for x in os.listdir(path):
             if os.path.isdir(path + "/" + x):
                 self.upload_Folder(path + "/" + x, x, folder_ID=folder_id)
@@ -120,8 +122,11 @@ class GoogleDriveHandler:
         return folder_id
 
     def delete_folder(self, parent_id):
-        file = self.drive.CreateFile({"id": parent_id})
-        file.Delete()
+        try:
+            file = self.drive.CreateFile({"id": parent_id})
+            file.Delete()
+        except BaseException:
+            pass
 
 
 if __name__ == "__main__":

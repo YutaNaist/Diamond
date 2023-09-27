@@ -322,6 +322,7 @@ class FinishExperiment:
                 "str_parent_id_in_google_drive"
             ] = parent_id
             self._save_Experiment_information()
+            self.logger.debug("Finish uploading. parent_id: {}".format(parent_id))
 
             return True
             # file_List = glob.glob(up_Load_Directory + "**", recursive=True)
