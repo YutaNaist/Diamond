@@ -146,7 +146,6 @@ class FinishExperiment:
         except BaseException as exception:
             dictReturnMsg["status"] = False
             dictReturnMsg["message"] = "Error with {}".format(exception)
-        self._save_Experiment_information()
         # filesInShareFolder = glob.glob(self.str_Share_Directory + "/*")
         # for folder in filesInShareFolder:
         #     print(folder)
@@ -319,6 +318,11 @@ class FinishExperiment:
             parent_id = google_Drive_Handler.upload_Folder(
                 up_Load_Directory, up_Load_Directory_Name
             )
+            self.dict_Experiment_Information[
+                "str_parent_id_in_google_drive"
+            ] = parent_id
+            self._save_Experiment_information()
+
             return True
             # file_List = glob.glob(up_Load_Directory + "**", recursive=True)
             # for file in file_List:

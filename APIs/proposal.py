@@ -4,6 +4,7 @@ import json
 import pandas
 import datetime
 import logging
+
 # import time
 # import random
 
@@ -17,17 +18,26 @@ class ErrorProposal(Exception):
     pass
 
 
-class Proposal():
-
+class Proposal:
     def __init__(self, logger=None):
         if logger is None:
             self.logger = logging.getLogger(__name__)
         else:
             self.logger = logger
         self._listKeys = [
-            "id", "index", "creators", "contact", "instrument",
-            "experiment_date", "data_delivery", "arim_upload", "updated_at",
-            "enable_status", "is_used_now", "is_finished", "url_for_edit"
+            "id",
+            "index",
+            "creators",
+            "contact",
+            "instrument",
+            "experiment_date",
+            "data_delivery",
+            "arim_upload",
+            "updated_at",
+            "enable_status",
+            "is_used_now",
+            "is_finished",
+            "url_for_edit",
         ]
         self._dictProposal = {}
         pass
@@ -38,7 +48,8 @@ class Proposal():
                 self._dictProposal[key] = dictJsonDatabase_[key]
             except KeyError:
                 raise ErrorProposal(
-                    "ErrorProposal: The key of {} is missing".format(key))
+                    "ErrorProposal: The key of {} is missing".format(key)
+                )
 
     def getID(self):
         return self._dictProposal["id"]
@@ -73,26 +84,29 @@ class Proposal():
 
     def saveSingleProposal(self, filename_):
         # with open(filename_, mode="w", encoding="utf-8") as f:
-        if self._dictProposal[
-                "enable_status"] == "Enable" and self._dictProposal[
-                    "id"] != "0000-000-000001":
-            with open(filename_, mode="w", encoding='utf-8') as f:
+        if (
+            self._dictProposal["enable_status"] == "Enable"
+            and self._dictProposal["id"] != "0000-000-000001"
+        ):
+            with open(filename_, mode="w", encoding="utf-8") as f:
                 json.dump(self._dictProposal, f, ensure_ascii=False, indent=4)
 
     def updateTimeToCurrentTime(self):
         currentTime = datetime.datetime.now()
         currentTimeText = "{:04}/{:02}/{:02} {:02}:{:02}".format(
-            currentTime.year, currentTime.month, currentTime.day,
-            currentTime.hour, currentTime.minute)
+            currentTime.year,
+            currentTime.month,
+            currentTime.day,
+            currentTime.hour,
+            currentTime.minute,
+        )
         self._dictProposal["updated_at"] = currentTimeText
 
 
 class ProposalList:
-
-    def __init__(self,
-                 str_Authorize_Json="",
-                 google_Spread_Sheet_Handler=None,
-                 logger=None):
+    def __init__(
+        self, str_Authorize_Json="", google_Spread_Sheet_Handler=None, logger=None
+    ):
         if logger is None:
             self.logger = logging.getLogger(__name__)
         else:
@@ -106,12 +120,15 @@ class ProposalList:
         self.default_Experiment_ID = "0000-0000-00001"
 
         if str_Authorize_Json == "":
-            self.str_Authorize_Json = "C:/share/diamond/testproject-spreadsheet-385502-7ac002cbfaa5.json"
+            self.str_Authorize_Json = (
+                "C:/share/diamond/testproject-spreadsheet-385502-7ac002cbfaa5.json"
+            )
         else:
             self.str_Authorize_Json = str_Authorize_Json
         if google_Spread_Sheet_Handler is None:
             self.google_Spread_Sheet_Handler = GoogleSpreadSheetHandler(
-                self.str_Authorize_Json, logger=self.logger)
+                self.str_Authorize_Json, logger=self.logger
+            )
         else:
             self.google_Spread_Sheet_Handler = google_Spread_Sheet_Handler
         self.listIDsSpreadSheet = []
@@ -145,8 +162,7 @@ class ProposalList:
 
     def read_Proposal_List_From_Database_Json(self, str_Filename_Json):
         self.str_Filename_Proposal_List = str_Filename_Json
-        listDictJson = json.load(
-            open(str_Filename_Json, mode="r", encoding='utf-8'))
+        listDictJson = json.load(open(str_Filename_Json, mode="r", encoding="utf-8"))
         for dictJson in listDictJson:
             self.update_Proposal_By_Dict(dictJson)
 
@@ -164,41 +180,49 @@ class ProposalList:
     def delete_Proposals_Checking_Enable_Status(self):
         for i in range(self._numberOfProposals - 1, -1, -1):
             dict_Proposal = self._proposals[i].getDictProposal()
-            if dict_Proposal["enable_status"] == "Disable" or dict_Proposal[
-                    "id"] == self.default_Experiment_ID:
+            if (
+                dict_Proposal["enable_status"] == "Disable"
+                or dict_Proposal["id"] == self.default_Experiment_ID
+            ):
                 self.delete_Proposal(i)
 
-    def load_From_SpreadSheet_Input(self,
-                                    str_url_spreadsheet_input="",
-                                    dict_Instrument_ID={}):
+    def load_From_SpreadSheet_Input(
+        self, str_url_spreadsheet_input="", dict_Instrument_ID={}
+    ):
         bool_Flag_Updated = False
         self.logger.debug("Start Load From Spread Sheet")
-        all_Value_Spread_Sheet = self.google_Spread_Sheet_Handler.load_All_Value_From_Input_Sheet(
-            str_url_spreadsheet_input)
+        all_Value_Spread_Sheet = (
+            self.google_Spread_Sheet_Handler.load_All_Value_From_Input_Sheet(
+                str_url_spreadsheet_input
+            )
+        )
         if all_Value_Spread_Sheet != []:
             bool_Flag_Updated = True
-            list_Dict_Spread_Sheet, list_ID_SpreadSheet = self.translate_SpreadSheet_To_Dict(
-                all_Value_Spread_Sheet, dict_Instrument_ID)
+            (
+                list_Dict_Spread_Sheet,
+                list_ID_SpreadSheet,
+            ) = self.translate_SpreadSheet_To_Dict(
+                all_Value_Spread_Sheet, dict_Instrument_ID
+            )
             for k, dict_Spread_Sheet in enumerate(list_Dict_Spread_Sheet):
                 # str_ID = list_ID_SpreadSheet[i]
                 self.update_Proposal_By_Dict(dict_Spread_Sheet)
             self.delete_Proposals_Checking_Enable_Status()
         return bool_Flag_Updated
 
-    def translate_SpreadSheet_To_Dict(self,
-                                      list_SpreadSheet,
-                                      dict_instrument_id={}):
-
+    def translate_SpreadSheet_To_Dict(self, list_SpreadSheet, dict_instrument_id={}):
         # keys = list_SpreadSheet[0]
         listDictProposals = []
         list_ID = []
         for i in range(1, len(list_SpreadSheet)):
             try:
-                s_format = '%Y/%m/%d %H:%M:%S'
-                newest_date = datetime.datetime.strptime(list_SpreadSheet[i][0], s_format)
+                s_format = "%Y/%m/%d %H:%M:%S"
+                newest_date = datetime.datetime.strptime(
+                    list_SpreadSheet[i][0], s_format
+                )
             except ValueError:
                 continue
-            #if (list_SpreadSheet[i][0]) == "":
+            # if (list_SpreadSheet[i][0]) == "":
             dictProposal = {}
             # dictProposal["index"] = dictExcelFile["Index"]
             dictProposal["index"] = 0
@@ -222,21 +246,18 @@ class ProposalList:
             dictInstrument["name"] = list_SpreadSheet[i][7]
             try:
                 dictInstrument["identifier"] = dict_instrument_id[
-                    list_SpreadSheet[i][7]]
+                    list_SpreadSheet[i][7]
+                ]
             except KeyError:
                 dictInstrument["identifier"] = "NR-000"
             dictProposal["instrument"] = dictInstrument
 
             dictExperimentDate = {}
 
-            dictExperimentDate["start_date"] = list_SpreadSheet[i][8].split(
-                " ")[0]
-            dictExperimentDate["start_time"] = list_SpreadSheet[i][8].split(
-                " ")[-1]
-            dictExperimentDate["end_date"] = list_SpreadSheet[i][9].split(
-                " ")[0]
-            dictExperimentDate["end_time"] = list_SpreadSheet[i][9].split(
-                " ")[-1]
+            dictExperimentDate["start_date"] = list_SpreadSheet[i][8].split(" ")[0]
+            dictExperimentDate["start_time"] = list_SpreadSheet[i][8].split(" ")[-1]
+            dictExperimentDate["end_date"] = list_SpreadSheet[i][9].split(" ")[0]
+            dictExperimentDate["end_time"] = list_SpreadSheet[i][9].split(" ")[-1]
             dictProposal["experiment_date"] = dictExperimentDate
 
             dictDataDelivery = {}
@@ -268,64 +289,83 @@ class ProposalList:
             dictProposal["id"] = created_ID
             list_ID.append(dictProposal["id"])
             listDictProposals.append(dictProposal)
-            return listDictProposals, list_ID
+        return listDictProposals, list_ID
 
-    def load_From_SpreadSheet_List(self,
-                                   list_generate_ID=[1, 0],
-                                   dict_Instrument_ID={}):
-        list_ID_SpreadSheet_Input = self.google_Spread_Sheet_Handler.get_list_ID_Spread_Sheet_Input(
+    def load_From_SpreadSheet_List(
+        self, list_generate_ID=[1, 0], dict_Instrument_ID={}
+    ):
+        list_ID_SpreadSheet_Input = (
+            self.google_Spread_Sheet_Handler.get_list_ID_Spread_Sheet_Input()
         )
         bool_Flag_Updated = False
         int_Len_ID_SpreadSheet = len(list_ID_SpreadSheet_Input)
         for i, ID_Spread_Sheet in enumerate(list_ID_SpreadSheet_Input):
-            self.logger.debug("Progress Load Spread Sheet: {}/{}".format(
-                i, int_Len_ID_SpreadSheet))
-            all_Value_Spread_Sheet = self.google_Spread_Sheet_Handler.load_All_Value_From_Spread_Sheet_Input(
-                i)
+            self.logger.debug(
+                "Progress Load Spread Sheet: {}/{}".format(i, int_Len_ID_SpreadSheet)
+            )
+            all_Value_Spread_Sheet = (
+                self.google_Spread_Sheet_Handler.load_All_Value_From_Spread_Sheet_Input(
+                    i
+                )
+            )
             if all_Value_Spread_Sheet != []:
                 bool_Flag_Updated = True
                 # all_Value_Spread_Sheet = self.google_Spread_Sheet_Handler.load_All_Value_From_Spread_Sheet(
                 #     str_ID_Spread_Sheet_, self.str_Authorize_Json)
                 df_Spreadsheet = pandas.DataFrame(
-                    all_Value_Spread_Sheet[1:],
-                    columns=all_Value_Spread_Sheet[0])
-                list_Dict_Spread_Sheet, list_ID_SpreadSheet = self.translate_DataFrame_To_Dict(
+                    all_Value_Spread_Sheet[1:], columns=all_Value_Spread_Sheet[0]
+                )
+                (
+                    list_Dict_Spread_Sheet,
+                    list_ID_SpreadSheet,
+                ) = self.translate_DataFrame_To_Dict(
                     df_Spreadsheet,
                     list_generate_ID=list_generate_ID,
-                    dict_Instrument_ID=dict_Instrument_ID)
+                    dict_Instrument_ID=dict_Instrument_ID,
+                )
                 for k, dict_Spread_Sheet in enumerate(list_Dict_Spread_Sheet):
                     # str_ID = list_ID_SpreadSheet[i]
                     self.update_Proposal_By_Dict(dict_Spread_Sheet)
 
                 self.google_Spread_Sheet_Handler.overwrite_ID_Value_To_Spread_Sheet(
-                    i, list_ID_SpreadSheet, self.int_Last_Colum_SpreadSheet)
+                    i, list_ID_SpreadSheet, self.int_Last_Colum_SpreadSheet
+                )
                 self.delete_Proposals_Checking_Enable_Status()
         return bool_Flag_Updated
 
-    def load_From_SpreadSheet(self,
-                              str_ID_Spread_Sheet_="",
-                              int_Index_Sheet=0,
-                              list_generate_ID=[1, 0],
-                              dict_Instrument_ID={},
-                              google_Spread_Sheet_Handler=None):
+    def load_From_SpreadSheet(
+        self,
+        str_ID_Spread_Sheet_="",
+        int_Index_Sheet=0,
+        list_generate_ID=[1, 0],
+        dict_Instrument_ID={},
+        google_Spread_Sheet_Handler=None,
+    ):
         if google_Spread_Sheet_Handler is None:
             google_Spread_Sheet_Handler = GoogleSpreadSheetHandler("")
         try:
-            all_Value_Spread_Sheet = google_Spread_Sheet_Handler.load_All_Value_From_Spread_Sheet(
-                str_ID_Spread_Sheet_, self.str_Authorize_Json)
-            dfSpreadsheet = pandas.DataFrame(all_Value_Spread_Sheet[1:],
-                                             columns=all_Value_Spread_Sheet[0])
+            all_Value_Spread_Sheet = (
+                google_Spread_Sheet_Handler.load_All_Value_From_Spread_Sheet(
+                    str_ID_Spread_Sheet_, self.str_Authorize_Json
+                )
+            )
+            dfSpreadsheet = pandas.DataFrame(
+                all_Value_Spread_Sheet[1:], columns=all_Value_Spread_Sheet[0]
+            )
         except PermissionError:
             return False
         listDictSpreadSheet, list_ID_SpreadSheet = self.translate_DataFrame_To_Dict(
             dfSpreadsheet,
             int_Index_Sheet,
             list_generate_ID=list_generate_ID,
-            dict_Instrument_ID=dict_Instrument_ID)
+            dict_Instrument_ID=dict_Instrument_ID,
+        )
         try:
             self.google_Spread_Sheet_Handler.overwrite_ID_Value_To_Spread_Sheet(
-                str_ID_Spread_Sheet_, list_ID_SpreadSheet,
-                self.int_Last_Colum_SpreadSheet)
+                str_ID_Spread_Sheet_,
+                list_ID_SpreadSheet,
+                self.int_Last_Colum_SpreadSheet,
+            )
         except PermissionError:
             return False
         for dictSpreadsheet in listDictSpreadSheet:
@@ -333,10 +373,9 @@ class ProposalList:
         self.delete_Proposals_Checking_Enable_Status()
         return True
 
-    def translate_DataFrame_To_Dict(self,
-                                    df_Spread_Sheet,
-                                    list_generate_ID=[3215, 0],
-                                    dict_Instrument_ID={}):
+    def translate_DataFrame_To_Dict(
+        self, df_Spread_Sheet, list_generate_ID=[3215, 0], dict_Instrument_ID={}
+    ):
         listDictProposals = []
         list_ID = []
         for i in range(df_Spread_Sheet.shape[0]):
@@ -366,7 +405,8 @@ class ProposalList:
             dictInstrument["name"] = dict_Spread_Sheet["Instrument"]
             try:
                 dictInstrument["identifier"] = dict_Instrument_ID[
-                    dict_Spread_Sheet["Instrument"]]
+                    dict_Spread_Sheet["Instrument"]
+                ]
             except KeyError:
                 dictInstrument["identifier"] = "NR-000"
             dictProposal["instrument"] = dictInstrument
@@ -375,16 +415,19 @@ class ProposalList:
             str_Start_Date = "{}/{}/{}".format(
                 dict_Spread_Sheet["Start Year"],
                 dict_Spread_Sheet["Start Month"],
-                dict_Spread_Sheet["Start Day"])
+                dict_Spread_Sheet["Start Day"],
+            )
             str_Start_Time = "{}:{:02}:{:02}".format(
-                dict_Spread_Sheet["Start Hour"],
-                dict_Spread_Sheet["Start Minute"], 0)
-            str_End_Date = "{}/{}/{}".format(dict_Spread_Sheet["Start Year"],
-                                             dict_Spread_Sheet["End Month"],
-                                             dict_Spread_Sheet["End Day"])
+                dict_Spread_Sheet["Start Hour"], dict_Spread_Sheet["Start Minute"], 0
+            )
+            str_End_Date = "{}/{}/{}".format(
+                dict_Spread_Sheet["Start Year"],
+                dict_Spread_Sheet["End Month"],
+                dict_Spread_Sheet["End Day"],
+            )
             str_End_Time = "{}:{:02}:{:02}".format(
-                dict_Spread_Sheet["End Hour"], dict_Spread_Sheet["End Minute"],
-                0)
+                dict_Spread_Sheet["End Hour"], dict_Spread_Sheet["End Minute"], 0
+            )
 
             dictExperimentDate["start_date"] = str_Start_Date
             dictExperimentDate["start_time"] = str_Start_Time
@@ -394,8 +437,7 @@ class ProposalList:
 
             dictDataDelivery = {}
             dictDataDelivery["status"] = dict_Spread_Sheet["Data Delivery"]
-            dictDataDelivery["gmail_address"] = dict_Spread_Sheet[
-                "Gmail address"]
+            dictDataDelivery["gmail_address"] = dict_Spread_Sheet["Gmail address"]
             if "Upload to Google" in dict_Spread_Sheet["Data Delivery"]:
                 dictDataDelivery["is_share_with_google"] = True
             else:
@@ -418,8 +460,8 @@ class ProposalList:
             created_ID = dict_Spread_Sheet["Created ID"]
             if created_ID == "" or created_ID == self.default_Experiment_ID:
                 dictProposal["id"] = self.generate_Experiment_ID(
-                    dictProposal=dictProposal,
-                    list_generate_ID=list_generate_ID)
+                    dictProposal=dictProposal, list_generate_ID=list_generate_ID
+                )
             else:
                 dictProposal["id"] = created_ID
             list_ID.append(dictProposal["id"])
@@ -430,8 +472,10 @@ class ProposalList:
         listDictProposal = []
         for proposal in self._proposals:
             dict_Proposal = proposal.getDictProposal()
-            if dict_Proposal["enable_status"] == "Enable" and dict_Proposal[
-                    "id"] != self.default_Experiment_ID:
+            if (
+                dict_Proposal["enable_status"] == "Enable"
+                and dict_Proposal["id"] != self.default_Experiment_ID
+            ):
                 listDictProposal.append(dict_Proposal)
         if str_Filename_To_Save_Json == "":
             str_Filename_To_Save_Json = self.str_Filename_Proposal_List
@@ -439,13 +483,23 @@ class ProposalList:
             json.dump(listDictProposal, f, indent=4, ensure_ascii=False)
 
     def update_Spread_Sheet_For_Brows(self):
-        list_Str_ID_Brows_Spread_Sheet = self.google_Spread_Sheet_Handler.get_list_ID_Spread_Sheet_Brows(
+        list_Str_ID_Brows_Spread_Sheet = (
+            self.google_Spread_Sheet_Handler.get_list_ID_Spread_Sheet_Brows()
         )
         # str_ID_Brows_Spread_Sheet = list_Str_ID_Brows_Spread_Sheet[0]
         listColumns = [
-            "Experiment ID", "User Name", "Instrument", "Instrument ID",
-            "Start Date", "End Date", "Contact Information", "Data Delivery",
-            "GMail Account", "ARIM Upload", "ARIM ID", "URL For Edit"
+            "Experiment ID",
+            "User Name",
+            "Instrument",
+            "Instrument ID",
+            "Start Date",
+            "End Date",
+            "Contact Information",
+            "Data Delivery",
+            "GMail Account",
+            "ARIM Upload",
+            "ARIM ID",
+            "URL For Edit",
         ]
         listSave = []
         listSave.append(listColumns)
@@ -462,12 +516,17 @@ class ProposalList:
             listSaveSingle.append(dict_Proposal["creators"][0]["name"])
             listSaveSingle.append(dict_Proposal["instrument"]["name"])
             listSaveSingle.append(dict_Proposal["instrument"]["identifier"])
-            str_Start_Date = dict_Proposal["experiment_date"][
-                "start_date"] + " " + dict_Proposal["experiment_date"][
-                    "start_time"]
+            str_Start_Date = (
+                dict_Proposal["experiment_date"]["start_date"]
+                + " "
+                + dict_Proposal["experiment_date"]["start_time"]
+            )
             listSaveSingle.append(str_Start_Date)
-            str_End_Date = dict_Proposal["experiment_date"][
-                "end_date"] + " " + dict_Proposal["experiment_date"]["end_time"]
+            str_End_Date = (
+                dict_Proposal["experiment_date"]["end_date"]
+                + " "
+                + dict_Proposal["experiment_date"]["end_time"]
+            )
             listSaveSingle.append(str_End_Date)
             # listSaveSingle.append(
             #     proposal.getDictProposal()["experiment_date"]["end_date"])
@@ -476,16 +535,14 @@ class ProposalList:
             str_Contact_Information = ""
             str_Contact_Information += dict_Proposal["creators"][0]["email"]
             str_Contact_Information += "/"
-            str_Contact_Information += dict_Proposal["creators"][0][
-                "affiliation"]
+            str_Contact_Information += dict_Proposal["creators"][0]["affiliation"]
             str_Contact_Information += "/"
             str_Contact_Information += dict_Proposal["contact"]["phone_number"]
             str_Contact_Information += "/"
             str_Contact_Information += dict_Proposal["contact"]["address"]
             listSaveSingle.append(str_Contact_Information)
             listSaveSingle.append(dict_Proposal["data_delivery"]["status"])
-            listSaveSingle.append(
-                dict_Proposal["data_delivery"]["gmail_address"])
+            listSaveSingle.append(dict_Proposal["data_delivery"]["gmail_address"])
             listSaveSingle.append(dict_Proposal["arim_upload"]["status"])
             listSaveSingle.append(dict_Proposal["arim_upload"]["id"])
             try:
@@ -495,32 +552,38 @@ class ProposalList:
             listSave.append(listSaveSingle)
 
         int_Len_ID_SpreadSheet = len(list_Str_ID_Brows_Spread_Sheet)
-        for i, str_ID_Brows_Spread_Sheet in enumerate(
-                list_Str_ID_Brows_Spread_Sheet):
-            self.logger.debug("Progress Load Spread Sheet: {}/{}".format(
-                i, int_Len_ID_SpreadSheet))
+        for i, str_ID_Brows_Spread_Sheet in enumerate(list_Str_ID_Brows_Spread_Sheet):
+            self.logger.debug(
+                "Progress Load Spread Sheet: {}/{}".format(i, int_Len_ID_SpreadSheet)
+            )
             # print(i)
             # time.sleep(5)
             self.google_Spread_Sheet_Handler.overwrite_All_Value_To_Spread_Sheet_Brows(
-                i, listSave)
+                i, listSave
+            )
 
     def generate_Experiment_ID(self, dictProposal, list_generate_ID=[3215, 0]):
-        if not re.match(r"^[0-9]{4}/[0-9]{1,2}/[0-9]{1,2}$",
-                        dictProposal["experiment_date"]["start_date"]):
+        if not re.match(
+            r"^[0-9]{4}/[0-9]{1,2}/[0-9]{1,2}$",
+            dictProposal["experiment_date"]["start_date"],
+        ):
             experiment_ID = self.default_Experiment_ID
-        elif not re.match(r"^[0-9]{4}/[0-9]{1,2}/[0-9]{1,2}$",
-                          dictProposal["experiment_date"]["end_date"]):
+        elif not re.match(
+            r"^[0-9]{4}/[0-9]{1,2}/[0-9]{1,2}$",
+            dictProposal["experiment_date"]["end_date"],
+        ):
             experiment_ID = self.default_Experiment_ID
         elif dictProposal["creators"][0]["name"] == "":
             experiment_ID = self.default_Experiment_ID
         elif dictProposal["instrument"]["name"] == "":
             experiment_ID = self.default_Experiment_ID
         else:
-            strListStateDate = dictProposal["experiment_date"][
-                "start_date"].split("/")
-            datetimeStartDate = datetime.datetime(int(strListStateDate[0]),
-                                                  int(strListStateDate[1]),
-                                                  int(strListStateDate[2]))
+            strListStateDate = dictProposal["experiment_date"]["start_date"].split("/")
+            datetimeStartDate = datetime.datetime(
+                int(strListStateDate[0]),
+                int(strListStateDate[1]),
+                int(strListStateDate[2]),
+            )
             Index = list_generate_ID[0] * list_generate_ID[1]
             Index_Temp = Index
             parity1 = 0
@@ -536,9 +599,13 @@ class ProposalList:
 
             # parity = parity % 10
             experiment_ID = "{:02d}{:02d}-{:01d}{}-{:04d}{:01d}".format(
-                datetimeStartDate.year % 100, datetimeStartDate.month % 100,
-                parity1 % 10, dictProposal["instrument"]["identifier"][3:],
-                Index_Temp % 10**4, parity2 % 10)
+                datetimeStartDate.year % 100,
+                datetimeStartDate.month % 100,
+                parity1 % 10,
+                dictProposal["instrument"]["identifier"][3:],
+                Index_Temp % 10**4,
+                parity2 % 10,
+            )
             list_generate_ID[1] = (list_generate_ID[1] + 1) % 10**4
         return experiment_ID
 
@@ -553,7 +620,7 @@ class ProposalList:
 
 
 # %%
-if __name__ == '__main__':
+if __name__ == "__main__":
     proposal = ProposalList()
     proposal.loadIDListOfSpreadSheet()
     iDSheet = proposal.listIDsSpreadSheet[1]

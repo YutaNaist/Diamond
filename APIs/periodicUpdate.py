@@ -238,30 +238,6 @@ class PeriodicUpdate:
             self.str_url_spreadsheet_input, self.dict_Instrument_ID)
         self.logger.debug("load From Spread Sheet")
         self.logger.debug(is_Update)
-        '''
-        # data = googleSpreadSheetHandler.load_All_Value_From_Spread_Sheet(
-        #     self.str_ID_Spread_Sheet_ID_List, self.str_Authorize_Json)
-        # list_ID_SpreadSheet_Input = []
-        # list_ID_SpreadSheet_Brows = []
-        # list_index_SpreadSheet = []
-        # for i in range(len(data) - 1):
-        #     list_ID_SpreadSheet_Input.append(data[i + 1][1])
-        #     list_ID_SpreadSheet_Brows.append(data[i + 1][2])
-        #     list_index_SpreadSheet.append(data[i + 1][3])
-        # listIDSpreadSheet = [
-        #     list_ID_SpreadSheet_Input, list_ID_SpreadSheet_Brows,
-        #     list_index_SpreadSheet
-        # ]
-        self.logger.info("periodic: load spread sheet")
-        for i, idSpreadSheet in enumerate(listIDSpreadSheet[0]):
-            self.logger.info(i)
-            time.sleep(5)
-            self.proposal_List_To_Save.load_From_SpreadSheet(
-                idSpreadSheet,
-                int_Index_Sheet=int(listIDSpreadSheet[2][i]),
-                list_generate_ID=self.list_Temp_Generate_ID,
-                dict_Instrument_ID=self.dict_Instrument_ID)
-        '''
 
         # Save all proposal to Database/proposals.json
         self.proposal_List_To_Save.save_All_Proposals(
