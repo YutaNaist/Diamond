@@ -11,9 +11,9 @@ class checkID:
                 "storage_directory"]
             self.str_Proposal_Directory = dict_Environment_Variable[
                 "proposal_directory"]
-            self.str_IDs_Filename = dict_Environment_Variable[
-                "database_directory"] + dict_Environment_Variable[
-                    "database_user_id_json_loading"]
+            self.str_Dagabase_directory = dict_Environment_Variable["database_directory"]
+            self.str_IDs_Filename = self.str_Dagabase_directory + dict_Environment_Variable[
+                "database_user_id_json_loading"]
 
     def loadDatabase(self):
         self.proposalListCurrentList = ProposalList()
