@@ -501,7 +501,14 @@ class ProposalList:
             "ARIM ID",
             "URL For Edit",
         ]
+        first_line = ["" for i in range(len(listColumns))]
+        first_line[0] = "Register URL :"
+        first_line[
+            1
+        ] = "https://docs.google.com/forms/d/e/1FAIpQLScRdnWUe8hBALouh2hC1t8HHosAzj-ma54EofLYek76IDGCQA"
+
         listSave = []
+        listSave.append(first_line)
         listSave.append(listColumns)
         for proposal in self._proposals:
             dict_Proposal = proposal.getDictProposal()

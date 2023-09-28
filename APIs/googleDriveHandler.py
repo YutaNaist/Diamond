@@ -47,9 +47,6 @@ class GoogleDriveHandler:
                 {
                     "title": folder_name,
                     "mimeType": "application/vnd.google-apps.folder",
-                    "parents": [
-                        {"id": "1V3NRaZKANmpythm5AG8DBAvbaWDsNIj3"},
-                    ],
                 }
             )
         else:
@@ -103,6 +100,7 @@ class GoogleDriveHandler:
         folder = self.create_folder_Force(upload_Dir_Name, folder_ID)
 
         folder_id = folder["id"]
+
         for x in os.listdir(path):
             if os.path.isdir(path + "/" + x):
                 self.upload_Folder(path + "/" + x, x, folder_ID=folder_id)
@@ -122,11 +120,47 @@ class GoogleDriveHandler:
         return folder_id
 
     def delete_folder(self, parent_id):
-        try:
-            file = self.drive.CreateFile({"id": parent_id})
-            file.Delete()
-        except BaseException:
-            pass
+        file = self.drive.CreateFile({"id": parent_id})
+        file.Delete()
+
+    def get_file(self, id):
+        # file = self.drive.CreateFile({"id": id})
+        # file = self.drive.ListFile({"q": f"appProperties has \{ key = 'id' and value = '{id}' \} "}).GetList()
+        # file = self.drive.ListFile({"q": f"'id' = '{id}'"}).GetList()
+        # file = self.drive.ListFile({"q": f"title = 'Test001'"}).GetList()
+        files = self.drive.ListFile(
+            {"q": f"'1V3NRaZKANmpythm5AG8DBAvbaWDsNIj3' in parents"}
+        ).GetList()
+        # print(file[0].GetPermissions())
+        print(len(files))
+        for f in files:
+            if id == f.get("id"):
+                print(f)
+                print()
+
+    def get_permission(self, file_id):
+        file = self.drive.CreateFile({"id": file_id})
+        # file.cre
+        print(file.GetPermissions())
+
+    def share_file(self, folder_id, user_gmail):
+        files = self.drive.ListFile(
+            {"q": f"'1V3NRaZKANmpythm5AG8DBAvbaWDsNIj3' in parents"}
+        ).GetList()
+        # print(file[0].GetPermissions())
+        print(len(files))
+        for file in files:
+            if folder_id == file.get("id"):
+                print(file.GetPermissions())
+                print()
+                file.InsertPermission(
+                    new_permission={
+                        "type": "user",
+                        "value": user_gmail,
+                        "role": "writer",
+                    }
+                )
+                print(file.GetPermissions())
 
 
 if __name__ == "__main__":
@@ -145,8 +179,15 @@ if __name__ == "__main__":
     gdh = GoogleDriveHandler(Google_Auth_For_Drive, str_Setting_Yaml)
     gdh.set_experiment_ID("0000-0000-0001")
     up_load_path = "C:/Users/yutay/OneDrive/デスクトップ/Test/TestGoogle/test"
-    id = gdh.upload_Folder(
-        up_load_path, "Test001", folder_ID="1V3NRaZKANmpythm5AG8DBAvbaWDsNIj3"
-    )
-    print(id)
-    gdh.delete_folder("1BNysDBuRNuHaAsSwzOhOeREv9isFzlZL")
+    # gdh.get_file("1AJ5EzZzvsu4phMcpvwWDigKenfZAkKE1")
+    # gdh.get_permission("1AJ5EzZzvsu4phMcpvwWDigKenfZAkKE1")
+    gdh.share_file("1AJ5EzZzvsu4phMcpvwWDigKenfZAkKE1", "yuta.yamamoto@g.ext.naist.jp")
+
+    # id = gdh.upload_Folder(
+    #     up_load_path, "Test001", folder_ID="1V3NRaZKANmpythm5AG8DBAvbaWDsNIj3"
+    # )
+    # print(id)
+    # try:
+    #     gdh.delete_folder("1BNysDBuRNuHaAsSwzOhOeREv9isFzlZL")
+    # except BaseException:
+    #     pass

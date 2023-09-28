@@ -304,6 +304,7 @@ class FinishExperiment:
         if self.is_Share_With_Google is False:
             return True
         else:
+            # gmail_Address = self.str_Share_Google_Address
             google_Drive_Handler = GoogleDriveHandler(
                 google_Auth=self.google_Auth_For_Drive,
                 setting_path=self.str_Setting_Yaml,
@@ -318,6 +319,12 @@ class FinishExperiment:
             parent_id = google_Drive_Handler.upload_Folder(
                 up_Load_Directory, up_Load_Directory_Name
             )
+            try:
+                google_Drive_Handler.share_file(
+                    parent_id, self.str_Share_Google_Address
+                )
+            except BaseException:
+                pass
             self.dict_Experiment_Information[
                 "str_parent_id_in_google_drive"
             ] = parent_id
