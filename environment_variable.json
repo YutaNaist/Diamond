@@ -1,9 +1,9 @@
 {
-    "host_ip":"localhost",
+    "host_ip":"192.168.150.10",
     "host_port": 5462,
-    "proposal_directory": "C:/Test/Data/Proposal/",
-    "storage_directory" : "C:/Test/Data/",
-    "database_directory": "C:/Test/Database/",
+    "proposal_directory": "D:/Data/Proposal/",
+    "storage_directory" : "D:/Data/",
+    "database_directory": "D:/Database/",
     "api_key_spreadsheet_list" : "https://docs.google.com/spreadsheets/d/1RKqDvqWKRsB6tqNfSMn2Y1Xkqh2kKuDdEPiKqlOKD8s/edit#gid=0",
     "spreadsheet_url_input": "https://docs.google.com/spreadsheets/d/1RaO6yq9Jfl0snhZ-tT-75oh1e_VX-uAWqmR1WOfXrpM/edit#gid=829865946",
     "database_user_information_json_loading":"databaseUser.json" ,
