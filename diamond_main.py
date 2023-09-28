@@ -63,7 +63,7 @@ def get_request():
     print()
     logger.info(json_data["command"])
     logger.info(json_data["identifier"])
-    logger.debug(json_data["args"])
+    # logger.debug(json_data["args"])
     print()
     # print(json_data["identifier"])
     command = json_data['command']

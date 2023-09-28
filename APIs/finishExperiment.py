@@ -314,23 +314,29 @@ class FinishExperiment:
             )
             up_Load_Directory_Name = up_Load_Directory.split("/")[-1]
             if self.str_parent_id_in_google_drive != "":
-                google_Drive_Handler.delete_folder(self.str_parent_id_in_google_drive)
+                try:
+                    google_Drive_Handler.delete_folder(self.str_parent_id_in_google_drive)
+                except BaseException as e:
+                    self.logger.warning("Fail to delete folder in Google drive")
+                    self.logger.warning(e)
             parent_id = google_Drive_Handler.upload_Folder(
                 up_Load_Directory, up_Load_Directory_Name
             )
             try:
+                # print("share add")
                 google_Drive_Handler.share_file(
                     parent_id, self.str_Share_Google_Address
                 )
+                # print("share finish")
             except BaseException as e:
-                print(e)
+                self.logger.warning("Failed to share google folder")
+                self.logger.warning(e)
                 pass
             self.dict_Experiment_Information[
                 "str_parent_id_in_google_drive"
             ] = parent_id
             self._save_Experiment_information()
             self.logger.debug("Finish uploading. parent_id: {}".format(parent_id))
-
             return True
             # file_List = glob.glob(up_Load_Directory + "**", recursive=True)
             # for file in file_List:
