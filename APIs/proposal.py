@@ -505,7 +505,7 @@ class ProposalList:
         first_line[0] = "Register URL :"
         first_line[
             1
-        ] = "https://docs.google.com/forms/d/e/1FAIpQLScRdnWUe8hBALouh2hC1t8HHosAzj-ma54EofLYek76IDGCQA"
+        ] = "https://docs.google.com/forms/d/e/1FAIpQLScRdnWUe8hBALouh2hC1t8HHosAzj-ma54EofLYek76IDGCQA/viewform?usp=sf_link"
 
         listSave = []
         listSave.append(first_line)
