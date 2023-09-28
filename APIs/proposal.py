@@ -200,7 +200,10 @@ class ProposalList:
             )
         )
         if all_Value_Spread_Sheet != []:
-            bool_Flag_Updated = True
+            if is_flag_second_read is False:
+                bool_Flag_Updated = True
+            else:
+                bool_Flag_Updated = False
             (
                 list_Dict_Spread_Sheet,
                 list_ID_SpreadSheet,
