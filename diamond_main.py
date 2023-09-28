@@ -39,7 +39,7 @@ ipaddress = environment_Variable["host_ip"]
 port = environment_Variable["host_port"]
 
 Google_Auth_For_Drive = GoogleAuth(
-    environment_Variable["setting_yaml_google_drive_api"])
+    environment_Variable["database_directory"] + environment_Variable["setting_yaml_google_drive_api"])
 Google_Auth_For_Drive.LocalWebserverAuth()
 Google_Auth_For_Drive.CommandLineAuth()
 

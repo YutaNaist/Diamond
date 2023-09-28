@@ -10,6 +10,7 @@ class StartExperiment:
             self.dict_Environment_Variable = dict_Environment_Variable
             self.str_Save_Directory = self.dict_Environment_Variable[
                 "storage_directory"] + self.str_Experiment_ID + "/"
+            self.str_Dagabase_directory = dict_Environment_Variable["database_directory"]
             self.str_Proposal_File = self.str_Save_Directory + self.str_Experiment_ID + ".json_prop"
             self.str_Metadata_Directory = self.str_Save_Directory + "metadata/"
             self.str_Original_Data_Directory = self.str_Save_Directory + "data/"
