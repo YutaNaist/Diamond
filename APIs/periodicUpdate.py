@@ -278,7 +278,7 @@ class PeriodicUpdate:
             proposals = self.proposal_List_To_Save.get_List_All_Proposals()
             for proposal in proposals:
                 id = proposal.getID()
-                self.logger.info(id)
+                # self.logger.info(id)
                 isEnable = proposal.getIsEnable()
                 if isEnable is False:
                     continue
