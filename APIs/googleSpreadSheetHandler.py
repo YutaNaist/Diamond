@@ -30,6 +30,7 @@ class GoogleSpreadSheetHandler:
         self.last_updated_Input_sheet = ""
 
     def load_All_Value_From_Input_Sheet(self, str_URL_Spread_Sheet: str = "", is_force_read=False) -> list:
+        is_updated = False
         try:
             sheet = self.client.open_by_url(str_URL_Spread_Sheet)
             # last_Update = sheet.lastUpdateTime
@@ -46,11 +47,17 @@ class GoogleSpreadSheetHandler:
                         newest_date = compare_data
                 except ValueError:
                     pass
-            if newest_date == self.last_updated_Input_sheet and is_force_read is False:
-                return []
+            if newest_date == self.last_updated_Input_sheet:
+                is_updated = False
+                if is_force_read is True:
+                    return list_All, is_updated
+                else:
+                    return [], is_updated
             else:
+                is_updated = True
                 self.last_updated_Input_sheet = newest_date
-                return list_All
+                return list_All, is_updated
+            # if
 
         except gspread.exceptions.APIError:
             self.logger.warning("APIError in Load Spread Sheet")

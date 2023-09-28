@@ -194,16 +194,14 @@ class ProposalList:
     ):
         bool_Flag_Updated = False
         self.logger.debug("Start Load From Spread Sheet")
-        all_Value_Spread_Sheet = (
-            self.google_Spread_Sheet_Handler.load_All_Value_From_Input_Sheet(
-                str_url_spreadsheet_input, is_force_read=is_flag_second_read
-            )
+        (
+            all_Value_Spread_Sheet,
+            is_Updated,
+        ) = self.google_Spread_Sheet_Handler.load_All_Value_From_Input_Sheet(
+            str_url_spreadsheet_input, is_force_read=is_flag_second_read
         )
+        bool_Flag_Updated = is_Updated
         if all_Value_Spread_Sheet != []:
-            if is_flag_second_read is False:
-                bool_Flag_Updated = True
-            else:
-                bool_Flag_Updated = False
             (
                 list_Dict_Spread_Sheet,
                 list_ID_SpreadSheet,
