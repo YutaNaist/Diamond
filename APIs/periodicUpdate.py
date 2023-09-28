@@ -334,7 +334,6 @@ class PeriodicUpdate:
             self.is_flag_second_read = True
         else:
             self.is_flag_second_read = False
-
         """
         for i, idSpreadSheet in enumerate(listIDSpreadSheet[1]):
             self.logger.info(i)
