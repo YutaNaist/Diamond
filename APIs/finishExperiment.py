@@ -322,7 +322,8 @@ class FinishExperiment:
                 google_Drive_Handler.share_file(
                     parent_id, self.str_Share_Google_Address
                 )
-            except BaseException:
+            except BaseException as e:
+                print(e)
                 pass
             self.dict_Experiment_Information[
                 "str_parent_id_in_google_drive"

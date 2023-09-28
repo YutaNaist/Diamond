@@ -47,6 +47,9 @@ class GoogleDriveHandler:
                 {
                     "title": folder_name,
                     "mimeType": "application/vnd.google-apps.folder",
+                    "parents": [
+                        {"id": "1V3NRaZKANmpythm5AG8DBAvbaWDsNIj3"},
+                    ],
                 }
             )
         else:
