@@ -187,13 +187,16 @@ class ProposalList:
                 self.delete_Proposal(i)
 
     def load_From_SpreadSheet_Input(
-        self, str_url_spreadsheet_input="", dict_Instrument_ID={}
+        self,
+        str_url_spreadsheet_input="",
+        dict_Instrument_ID={},
+        is_flag_second_read=False,
     ):
         bool_Flag_Updated = False
         self.logger.debug("Start Load From Spread Sheet")
         all_Value_Spread_Sheet = (
             self.google_Spread_Sheet_Handler.load_All_Value_From_Input_Sheet(
-                str_url_spreadsheet_input
+                str_url_spreadsheet_input, is_force_read=is_flag_second_read
             )
         )
         if all_Value_Spread_Sheet != []:

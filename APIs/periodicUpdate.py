@@ -257,7 +257,9 @@ class PeriodicUpdate:
         #     list_generate_ID=self.list_Temp_Generate_ID,
         #     dict_Instrument_ID=self.dict_Instrument_ID)
         is_Update = self.proposal_List_To_Save.load_From_SpreadSheet_Input(
-            self.str_url_spreadsheet_input, self.dict_Instrument_ID
+            self.str_url_spreadsheet_input,
+            self.dict_Instrument_ID,
+            is_flag_second_read=self.is_flag_second_read,
         )
         self.logger.debug("load From Spread Sheet")
         self.logger.debug(is_Update)

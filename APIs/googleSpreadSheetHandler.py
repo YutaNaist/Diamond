@@ -29,7 +29,7 @@ class GoogleSpreadSheetHandler:
         self.last_updated_ID_List_Sheet = ""
         self.last_updated_Input_sheet = ""
 
-    def load_All_Value_From_Input_Sheet(self, str_URL_Spread_Sheet: str = "") -> list:
+    def load_All_Value_From_Input_Sheet(self, str_URL_Spread_Sheet: str = "", is_force_read=False) -> list:
         try:
             sheet = self.client.open_by_url(str_URL_Spread_Sheet)
             # last_Update = sheet.lastUpdateTime
@@ -46,7 +46,7 @@ class GoogleSpreadSheetHandler:
                         newest_date = compare_data
                 except ValueError:
                     pass
-            if newest_date == self.last_updated_Input_sheet:
+            if newest_date == self.last_updated_Input_sheet and is_force_read is False:
                 return []
             else:
                 self.last_updated_Input_sheet = newest_date
