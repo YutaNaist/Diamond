@@ -244,7 +244,6 @@ class FinishExperiment:
                     "data_delivery"]["gmail_address"]
             else:
                 self.is_Share_With_Google = False
-
             proposalCurrentProposal.saveSingleProposal(
                 self.str_Experiment_Directory + self.experiment_ID + ".json_prop")
             # if proposalCurrentProposal.getDictProposal()["data_delivery"]["status"] == "Google"
