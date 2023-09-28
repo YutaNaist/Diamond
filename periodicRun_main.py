@@ -1,16 +1,19 @@
 import json
+import yaml
 import logging
 
 from pydrive2.auth import GoogleAuth
 
 import commandsForDiamond
+from load_environment_variable import load_environment_variable
 
 
-def make_logger(environment_Variable):
+def make_logger(dict_Environment_Variable):
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
 
-    log_File_Handler = logging.FileHandler(environment_Variable["log_directory"] + 'log_periodic.log')
+    log_File_Handler = logging.FileHandler(
+        dict_Environment_Variable["database_directory"] + 'log_periodic.log')
     # log_File_Handler = logging.handlers.RotatingFileHandler(
     #     'C:/diamond/log_diamond.log', maxBytes=100_000_000, BackupCount=10)
     fh_formatter = logging.Formatter(
@@ -29,19 +32,34 @@ def make_logger(environment_Variable):
     return logger
 
 
-environment_Variable = json.load(
-    open("C:/Program Files/diamond/environment_variable.json", mode="r", encoding='utf-8'))
-logger = make_logger(environment_Variable)
-ipaddress = environment_Variable["host_ip"]
-port = environment_Variable["host_port"]
+dict_Environment_Variable = load_environment_variable()
+logger = make_logger(dict_Environment_Variable)
+ipaddress = dict_Environment_Variable["host_ip"]
+port = dict_Environment_Variable["host_port"]
+
+google_auth_setting_yaml_filename = dict_Environment_Variable[
+    "database_directory"] + dict_Environment_Variable[
+        "setting_yaml_google_drive_api"]
+google_auth_setting_yaml = yaml.load(open(google_auth_setting_yaml_filename,
+                                          mode="r"),
+                                     Loader=yaml.SafeLoader)
+google_auth_setting_yaml['client_config_file'] = dict_Environment_Variable[
+    "database_directory"] + "/Google_API_Keys/Certificate-Drive.json"
+
+# print(google_auth_setting_yaml)
+yaml.safe_dump(google_auth_setting_yaml,
+               open(google_auth_setting_yaml_filename, mode="w"),
+               default_flow_style=False,
+               allow_unicode=True)
 
 Google_Auth_For_Drive = GoogleAuth(
-    environment_Variable["setting_yaml_google_drive_api"])
+    dict_Environment_Variable["database_directory"] +
+    dict_Environment_Variable["setting_yaml_google_drive_api"])
 Google_Auth_For_Drive.LocalWebserverAuth()
 Google_Auth_For_Drive.CommandLineAuth()
 
 cmd = commandsForDiamond.CommandsDiamond(
-    logger=logger, environment_Variable=environment_Variable)
+    logger=logger, dict_Environment_Variable=dict_Environment_Variable)
 cmd.set_Google_Auth_For_Drive(Google_Auth_For_Drive)
 # cmd.set_Google_Auth_For_Drive(None)
 

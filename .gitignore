@@ -3,3 +3,7 @@ APIs/checkAndGetSingleProposal.py
 APIs/__pycache__
 __pycache__
 .vscode
+environment_variable-copy*
+copyTest.bat
+saved_credentials.json
+run-diamond copy.bat
