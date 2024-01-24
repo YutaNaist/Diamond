@@ -13,17 +13,11 @@
             "formatter": "simple",
             "stream": "ext://sys.stdout"
         },
-        "fileHandler": {
-            "class": "logging.FileHandler",
-            "level": "INFO",
-            "formatter": "simple",
-            "filename": "C:/Test/Database/log_diamond.log"
-        },
         "TimedRotatingFileHandler": {
             "class": "logging.handlers.TimedRotatingFileHandler",
             "level": "INFO",
             "formatter": "simple",
-            "filename": "C:/Test/Database/log_diamond.log",
+            "filename": "D:/Database/log_diamond.log",
             "when": "MIDNIGHT",
             "interval": 1,
             "backupCount": 30,

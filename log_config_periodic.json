@@ -13,16 +13,10 @@
             "formatter": "simple",
             "stream": "ext://sys.stdout"
         },
-        "fileHandler": {
-            "class": "logging.FileHandler",
-            "level": "INFO",
-            "formatter": "simple",
-            "filename": "C:/Test/Database/log_periodic.log",
-            "encoding": "utf8"
-        },
+
         "TimedRotatingFileHandler": { "class": "logging.handlers.TimedRotatingFileHandler", "level": "INFO",
             "formatter": "simple",
-            "filename": "C:/Test/Database/log_periodic.log",
+            "filename": "D:/Database/log_periodic.log",
             "when": "MIDNIGHT",
             "interval": 1,
             "backupCount": 30,
