@@ -1,5 +1,6 @@
 import json
 import logging
+
 # from multiprocessing import Process
 
 from flask import Flask, request, jsonify
@@ -10,26 +11,30 @@ from load_environment_variable import load_environment_variable
 
 
 def make_logger(dict_Environment_Variable):
+    log_config = json.load(open("log_config_diamond.json", mode="r"))
+    logging.config.dictConfig(log_config)
     logger = logging.getLogger(__name__)
-    logger.setLevel(logging.DEBUG)
 
-    log_File_Handler = logging.FileHandler(
-        dict_Environment_Variable["database_directory"] + 'log_diamond.log')
-    # log_File_Handler = logging.handlers.RotatingFileHandler(
-    #     'C:/diamond/log_diamond.log', maxBytes=100_000_000, BackupCount=10)
-    fh_formatter = logging.Formatter(
-        '%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s -%(process)d - %(message)s'
-    )
-    log_File_Handler.setFormatter(fh_formatter)
+    # logger = logging.getLogger(__name__)
+    # logger.setLevel(logging.DEBUG)
 
-    log_Stream_Handler = logging.StreamHandler()
-    sh_formatter = logging.Formatter(
-        '%(asctime)s - %(levelname)s - %(process)d - %(message)s',
-        '%Y/%m/%d %H:%M:%S')
-    log_Stream_Handler.setFormatter(sh_formatter)
+    # log_File_Handler = logging.FileHandler(
+    #     dict_Environment_Variable["database_directory"] + 'log_diamond.log')
+    # # log_File_Handler = logging.handlers.RotatingFileHandler(
+    # #     'C:/diamond/log_diamond.log', maxBytes=100_000_000, BackupCount=10)
+    # fh_formatter = logging.Formatter(
+    #     '%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s -%(process)d - %(message)s'
+    # )
+    # log_File_Handler.setFormatter(fh_formatter)
 
-    logger.addHandler(log_File_Handler)
-    logger.addHandler(log_Stream_Handler)
+    # log_Stream_Handler = logging.StreamHandler()
+    # sh_formatter = logging.Formatter(
+    #     '%(asctime)s - %(levelname)s - %(process)d - %(message)s',
+    #     '%Y/%m/%d %H:%M:%S')
+    # log_Stream_Handler.setFormatter(sh_formatter)
+
+    # logger.addHandler(log_File_Handler)
+    # logger.addHandler(log_Stream_Handler)
     return logger
 
 
@@ -39,25 +44,27 @@ ipaddress = dict_Environment_Variable["host_ip"]
 port = dict_Environment_Variable["host_port"]
 
 Google_Auth_For_Drive = GoogleAuth(
-    dict_Environment_Variable["database_directory"] +
-    dict_Environment_Variable["setting_yaml_google_drive_api"])
+    dict_Environment_Variable["database_directory"]
+    + dict_Environment_Variable["setting_yaml_google_drive_api"]
+)
 Google_Auth_For_Drive.LocalWebserverAuth()
 Google_Auth_For_Drive.CommandLineAuth()
 
 cmd = commandsForDiamond.CommandsDiamond(
-    logger=logger, dict_Environment_Variable=dict_Environment_Variable)
+    logger=logger, dict_Environment_Variable=dict_Environment_Variable
+)
 cmd.set_Google_Auth_For_Drive(Google_Auth_For_Drive)
 # cmd.set_Google_Auth_For_Drive(None)
 
 app = Flask(__name__)
 
 
-@app.route('/')
+@app.route("/")
 def hello():
-    return 'Hello, World!'
+    return "Hello, World!"
 
 
-@app.route('/request', methods=['POST'])
+@app.route("/request", methods=["POST"])
 def get_request():
     json_data = request.get_json()
     print()
@@ -66,9 +73,9 @@ def get_request():
     # logger.debug(json_data["args"])
     print()
     # print(json_data["identifier"])
-    command = json_data['command']
-    args = json_data['args']
-    identifier = json_data['identifier']
+    command = json_data["command"]
+    args = json_data["args"]
+    identifier = json_data["identifier"]
     # response_data = {}
     response = cmd.check_UsageID(command, args, identifier)
     if response is not None:
@@ -103,11 +110,11 @@ def get_request():
         "message": "Error: No such command",
         "command": command,
         "status": False,
-        "identifier": identifier
+        "identifier": identifier,
     }
 
 
-@app.route('/test', methods=['POST'])
+@app.route("/test", methods=["POST"])
 def test():
     x = 0
     for i in range(100):
@@ -127,7 +134,7 @@ def runFlask(**kwargs):
     app.run(**kwargs)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # processScheduleUpdate = Process(
     #     target=cmd.periodic_Update_From_Excel_Files(), args=())
     # print("Periodic update process start")
