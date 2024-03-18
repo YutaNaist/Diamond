@@ -1,7 +1,7 @@
 import json
 import logging
 import logging.config
- 
+
 # from multiprocessing import Process
 
 from flask import Flask, request, jsonify
